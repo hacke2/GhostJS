@@ -11,6 +11,7 @@ GhostJS is a Core JavaScript Lib that it include :
       @ Simple DOM Selector
       @ Pure JavaScript AJAX 
       @ Pure JavaScript JSONP
+      @ Pure JavaScript Cookie
       @ Pure JavaScript animate with Tween Algorithm
       @ Pure JavaScript DOM Operating
       @ Pure JavaScript Bind Event and Powerful Unbind Event with Go.NoSQL
