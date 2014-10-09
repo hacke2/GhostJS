@@ -16,3 +16,11 @@ GhostJS is a Core JavaScript Lib that it include :
       @ Pure JavaScript DOM Operating
       @ Pure JavaScript Bind Event and Powerful Unbind Event with Go.NoSQL
       
+
+=======
+
+DEMON Blog :
+http://demonc.com
+
+Email :
+wpymoshou3@gmail.com
