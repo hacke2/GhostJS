@@ -15,12 +15,14 @@
  *              ...缘分写在三生石上面...
  *              <-- 江南 -->
  *              < http://y.qq.com/#type=song&mid=001oGzem0k192p > 
+ *
  */
 
-(function (window, alreadyGo) {
-    if(!alreadyGo(window)){
+(function (Global, alreadyGo) {
+
+    if(!alreadyGo(Global))
         throw new Error("Ghost.js Require Browser");
-    }
+
 }(typeof window !== "undefined" ? window : this, function (BrowserGhost) {
 
     var VERSION = "Ghost 0.0.2",
@@ -28,16 +30,15 @@
         global = window,
         doc = document,
         userAgent =global.navigator.userAgent;
-    /*
+   /*
     * Go
     * @ 核心入口
     * @ 最终接入window
-    *
     */
     var Go = function (obj) {
          if (obj instanceof Function) {
 
-            /*
+           /*
             * 装载效果
             *
             * Go(function(){
@@ -47,15 +48,18 @@
             * 在DOM结构绘制完毕就会被加载.
             *
             * Go(function(){
-            *   Go.insetScript()
+            *   Go.insetScript(script)
             * });
             *
             *   @ 尾部插入脚本而不会阻塞DOM的绘制
             *   @ 尽量避免用尾部插入JavaScript的方式来重新定义全局某些DOM的样式
             *   @ 尾部加载js控制样式容易造成回流.
             *   @ 尽可控制单个内层DOM.造成重绘,而不是回流.
-            * })
-            * */
+            * 	
+            *   @ 通过Go.insetScript插入的脚本默认需要在闭包中执行
+            *	@ 无法在insetScript插入的脚本中增加 Go(function(){ -- code -- }) 装载逻辑, 因为在插入DOM结构中时. DOM已经完全绘制完毕
+            * 
+            */
 
             if (doc.addEventListener) {
                 doc.addEventListener("DOMContentLoaded", function () {
@@ -91,7 +95,7 @@
                 }
             }
         } else if ((obj.nodeType && obj.nodeType == 1) || !(this instanceof Go)) {
-            //DOM节点直接进行包装
+            //如果不是原始类型的Go 或者是一个DOM节点. 则通过 _Go 进行包装
             return new _Go(obj);
         } else if (obj instanceof Go || obj instanceof _Go) {
             //instancof Go 或者 _Go 则不做任何操作.
@@ -99,12 +103,10 @@
         }
     };
 
-    /*
-    *
+   /*
     * 初始声明
     * @ 主要成员Go创建之后,
     * @ 开始初始化
-    *
     */
     var MSIE8 = !-[1, ],
         broken = {},
@@ -121,6 +123,7 @@
         join = Go_Array.join,
         concat = Go_Array.concat,
         //ECMAScript 5
+        nativeKeys = Object.keys,
         nativeforEach = Go_Array.forEach,
         filter = Go_Array.filter;
 
@@ -132,8 +135,7 @@
         advSelector = /.+>.+/g,
         qSA = doc.querySelectorAll;
 
-    /*
-    *
+   /*
     * NoSQL DataBase
     * @ NoSQL 事件记录
     * @ 只要有DOM元素是通过 Go(DOM).bind(event,callback) 的方式绑定了事件.就会在Go.NoSQL保存对应的记录
@@ -154,19 +156,17 @@
     *           ]
     * @ NoSQL 存储容器
     * @ NoSQLStack 容器内存状态
-    *
-    * */
+    */
     Go.NoSQL = {};
     Go.NoSQLStack = 0;
 
-    /*
+   /*
     * GhostStack
     * @ 选择器缓存机制
     * @ 利用缓存极大降低选择器重复选择同一元素时候带来的性能损耗
     * @ 缓存默认存储前3次操作的选择器
     * @ 可以通过Go.PaddingStack 来扩充缓存的上限,一般默认都是3
     * @ 内部机制 Go.pushStack 想缓存中推入选择器
-    *
     */
     Go.GhostStack = [];
     Go.pushStack = function(_Go){
@@ -176,29 +176,28 @@
         push.call(Go.GhostStack,_Go);
     };
 
-    /*
-    *
+   /*
     * Go._NOOP
     * @ 空函数,什么也不做,方便Ghost内部和外部扩展调用.让外部废弃函数都指向_NOOP来避免重复创建无用匿名函数.
     * @ userAgent 浏览器嗅探
     * @ userAgent 不推荐使用
-    *
     */
     Go._NOOP = function(){};
 
-    Go.isIE8 = userAgent.indexOf("MSIE 8.0") > 0;
     Go.isIE = userAgent.indexOf("Trident") > 0;
+    Go.isIE6 = userAgent.indexOf("MSIE 6.0") > 0;
+    Go.isIE7 = userAgent.indexOf("MSIE 7.0") > 0;
+    Go.isIE8 = userAgent.indexOf("MSIE 8.0") > 0;
     Go.isChrome = userAgent.indexOf("Chrome") > 0;
     Go.isFireFox = userAgent.indexOf("Firefox") > 0;
 
 
-    /*
+   /*
     * _Go
     * @ 选择器包装入口
     * @ 接入Selector函数,工厂对象上创建seletor数组来容纳选择的DOM元素
     * @ 早先0.0.1版本时候Ghost主要是利用对象来存储DOM.
     * @ 默认最是字符串的形式传入elm
-    *
     */
 
      function _Go(elm) {
@@ -249,7 +248,7 @@
         }
     }
 
-    /*
+   /*
     * queueSelector
     * @ By DEMON
     * @ Date: 2014.10.1
@@ -329,13 +328,12 @@
         }
 
     }
-    /*
+   /*
     * _Go -> GhostSelector
     * @ 选择器函数入口
     * @ 判断高级拼装选择器
     * @ 判断普通选择器
-    *
-    * */
+    */
     function GhostSelector(elmstr){
         if(advSelector.test(elmstr))
             //高级拼装选择器
@@ -355,13 +353,12 @@
         }
     }
 
-    /*
+   /*
     * _Go.prototype
     * @ each 是prototype上的核心函数.
     * @ 所有扩展方法都是基于 _Go.selector. 也就是基于DOM
     * @ 本质是操作DOM元素
-    *
-    * */
+	*/
     Go.Extend = _Go.prototype = {
         constructor: _Go,
 
@@ -378,7 +375,7 @@
                     if (iterator.call(context, this.selector[i], i, this) === broken) return;
                 }
             } else {
-                if (!Object.keys) {
+                if (!nativeKeys) {
                     //MSD V8 Object Keys
                     Object.keys = (function () {
                         'use strict';
@@ -426,12 +423,12 @@
             }
         },
         signet: function(name,value){
-            /*
+           /*
             * signet
             * @ _Go(x).signet 为选择注入印记.
             * @ 或者取出印记,这种印记模式在某些情况下很常见
             *
-            * */
+            */
             if(arguments.length == 2)
                 this[name] = value;
             else
@@ -440,7 +437,7 @@
             return this;
         },
         at: function(index){
-            /*
+           /*
             * at
             * @ at是_Go.selector(选择器数组)的基础过滤函数
             * @ 传入index可以获取到当前选择器第n个DOM元素. 传入-1表示获取最后一个DOM元素.-2表示倒数第二个DOM元素
@@ -462,7 +459,7 @@
             return this;
         },
         back: function(){
-            /*
+           /*
             * back
             * @ 非常核心的功能
             * @ 只通过_Go(x).filterfunction().back()函数就可以返回一个选择器上一步的状态.则避免出现如下代码:
@@ -478,9 +475,9 @@
             *
             * @ 注意!!
             *   back 函数只能返回上一步操作
-            *   无法连续返回历史多部操作
-            *   比如 Go(x).back().back() //非法写法.
-            * @
+            *   无法连续返回历史多步操作
+            *   比如 Go(x).back().back() --则是非法写法.
+            * 
             */
             if(this.prevSeletor){
                 this.selector = this.prevSeletor;
@@ -495,7 +492,7 @@
         },
 
         first: function(){
-            /*
+           /*
             * first
             * @ 基于_Go.at(x)
             */
@@ -503,14 +500,14 @@
         },
 
         last:function(){
-            /*
+           /*
             * first
             * @ 基于_Go.at(-x)
             */
             return this.at(-1);
         },
         fix: function(func){
-            /*
+           /*
             * fix
             * @ 过滤出包含指定条件的DOM元素
             * @ 参考ECMAScript 5 中的filter函数工作原理
@@ -521,19 +518,12 @@
             this.selectMethod = this.selectMethod + " +fix";
 
             this.selector = Go.AryFiler(this.selector,func);
-            /*
-            Go.AryEach(fix,function(e,index){
-                if(func(e,index,self)){
-                    push.call(fix,e);
-                }
-            });
-            */
             this.length = this.selector.length;
 
             return this;
         },
         even:function(){
-            /*
+           /*
             * even
             * @ 基于_Go.fix(func)
             * @ even表示偶数 DOM元素呈现出来的偶数规则,而不是数组呈现出来偶数规则,因为数字索引是0,人们通常数DOM都不会是从0开始, 而是从1
@@ -542,7 +532,7 @@
         },
 
         odd:function(){
-            /*
+           /*
             * odd
             * @ 基于_Go.fix(func)
             * @ odd表示奇数, 但是DOM的呈现则是以奇数规则, 而不是数组奇数规则. 数组索引是从0开始的
@@ -551,7 +541,7 @@
         },
 
         next:function(){
-            /*
+           /*
             * next
             * @ next 则是用来获取选择器中,元素的相邻的下一个元素.
             * @ 例如DOM结构是
@@ -561,7 +551,6 @@
             *    Go(#b).next   //则选择器内部元素就会改变为 #c
             *
             * @ 支持批量
-            *
             */
             var self = this.selector,next =[];
             this.prevSeletor = self;
@@ -592,10 +581,9 @@
         },
 
         prev:function(){
-            /*
+           /*
             * prev
             * @ 与_Go.next()相反
-            *
             */
             var self = this.selector,prev =[];
             this.prevSeletor = self;
@@ -626,14 +614,13 @@
         },
 
         siblings:function(){
-            /*
+           /*
             * siblings
             * @ 选择除自己以外同级下相邻的所有元素. 例如:
             *       -> body(a b c d)
             *       Go(b).siblings  -> [a,c,d]
-            * @ _Go.next() 和 _Go.prev()的集合,
-            *
-            * */
+            * @ _Go.next() 和 _Go.prev()的集合
+			*/
             var self = this.selector,siblings =[];
             this.prevSeletor = self;
             this.status ="Ghost.selector.siblings.Filter()";
@@ -655,10 +642,9 @@
         },
 
         warp: function(){
-            /*
+           /*
             * warp
             * @ 选择器中所包含的元素的所有子元素
-            *
             */
             var self = this.selector,warp = [];
             this.prevSeletor = self;
@@ -676,7 +662,7 @@
             return this;
         },
         warpClass:function(className){
-            /*
+           /*
             * warpClass
             * @ 选择器元素所包含的子元素中, 包含className类名的元素
             */
@@ -686,17 +672,17 @@
         },
 
         warpTag:function(tagName){
-            /*
-             * warpTag
-             * @ 选择器元素所包含的子元素中, 标签名为tagName的元素
-             */
+           /*
+            * warpTag
+            * @ 选择器元素所包含的子元素中, 标签名为tagName的元素
+            */
             var self = this.warp();
             tagName = tagName.toUpperCase();
             return self.fix(function(e){ return e.nodeName===tagName });
         },
 
         ctains:function(name){
-            /*
+           /*
             * ctains
             * @ 基于 _Go.warpTag 和 _Go.warpClass
             */
@@ -1047,7 +1033,7 @@
         },
 
         gtInHTML:function(){
-            return this.selector[0].innerHTML;
+            return Go.GetRealNode(this.selector[0]).innerHTML;
         },
 
         insetText:function(text){
@@ -1058,7 +1044,7 @@
             return this;
         },
         gtInText:function(){
-            var elm = this.selector[0];
+            var elm = Go.GetRealNode(this.selector[0]);
             return elm.innerText || elm.textContent;
         },
         rmNode: function(){
@@ -1069,7 +1055,7 @@
             this.trash()
         },
         apend: function(elms){
-            var TargetlastElm = this.selector[0];
+            var TargetlastElm = Go.GetRealNode(this.selector[0]);
             if(typeof elms === 'object' && elms instanceof Array){
                 //包含了原生Dom的数组
                 Go.AryEach(elms,function(e){
@@ -1102,10 +1088,10 @@
             return this
         },
         w:function(){
-            return this.selector[0].offsetWidth;
+            return Go.GetRealNode(this.selector[0]).offsetWidth;
         },
         h:function(){
-            return this.selector[0].offsetHeight;
+            return Go.GetRealNode(this.selector[0]).offsetHeight;
         },
         gtPos: function(){
             return Go.getPosition(this.selector[0]);
@@ -1302,16 +1288,15 @@
                 "secure":null
             },useroptions);
 
-            var PackAgeCookie = [
-                options.name,"=",options.value,";",
-                "expires=", options.expires ,";",
-                "path=",options.path,";",
-                "domain=",options.domain,";"
-            ];
-            doc.cookie = Go.Trim(PackAgeCookie.join("") + (!options.secure?"":"secure"));
+            var PackAgeCookie =
+                options.name+"="+options.value+";"+
+                "expires="+ options.expires +";"+
+                "path="+options.path+";"+
+                "domain="+options.domain+";";
+            doc.cookie = Go.Trim(PackAgeCookie + (!options.secure?"":"secure"));
         }else if(useroptions === useroptions+""){
             if(useroptions.indexOf("=")>0){
-                //如果字符串包含等于, 则表示需要设置
+                //如果字符串包含等于 = , 则表示需要设置cookies
                 doc.cookie = useroptions;
             }else{
                 //如果是字符串没有等于, 则表示它需要获取cookies中某个名字对应的值.
@@ -1375,20 +1360,36 @@
         }
     };
 
-    /**
-     * @return {string}
-     */
-    //Go.PaddingString 填充字符串首位 增加空格
+
+    //Go.PaddingString 填充字符串首尾 增加空格
     Go.PaddingString = function(str){
-        return join.call([" ",str," "],"");
+    	//add String more fast than Array.prototype.join .  
+    	//[" ",str," "].join("")
+        return " "+str+" ";
     };
+    // Go.PddingStack Padding Selector Size more than 3
     Go.PaddingStack = function(_Go){
         Go.GhostStack.push(_Go);
     };
-    //Go.Trim 去除字符串收尾的空格
+    //Go.Trim 去除字符串首尾的空格
     Go.Trim = function(str){
         return str.replace(/^\s+|\s+$/gm,"");
     };
+    //Go.GetRealNode 获得真实的Node节点. IE6 7 NodeList Object 包装时需要进行一下改造. 可能问题出在each那里.
+    Go.GetRealNode = function(node){
+    	if(Go.isIE7 || Go.isIE6)
+    		Go.GetRealNode =function(node){
+    			//Object keys NodeList Selector
+    			return node[0];
+    		}
+    	else
+    		Go.GetRealNode = function(node){
+    			return node;
+    		}
+    	return Go.GetRealNode(node);
+    }
+    //Go.ListAry 还原一个真实的数组, 类似于function中arguments都不是真实的数组,包括IE8下的原生选择器的NodeList. 所以要包装一次
+    // 比如 document.getElementsByClassName 这样的HTML5的方法 也不是返回一个真实纯净的数组
     Go.ListAry = function(ary){
         if(MSIE8){
             Go.ListAry = function(Ary){
@@ -1406,13 +1407,16 @@
         }
         return Go.ListAry(ary);
     };
+    //Go.AryEach 正常迭代方式.可以多绑定一个上下文
     Go.AryEach = function(ary,callback,context){
         for(var i= 0,l=ary.length;i<l;i++){
             callback(ary[i],i,ary,context);
         }
     };
+    //Go.AryFiler 命名应该是 Go.AryFilter...少一个t也没什么..额
     Go.AryFiler = function(ary,func){
         if(filter){
+        	//ECMAScript 5 filter 方式
             Go.AryFiler = function(ary,func){
                 return ary.filter(func)
             };
@@ -1430,37 +1434,85 @@
         }
         return Go.AryFiler(ary,func)
     };
+    //Go.AryLoop 是模拟队列, 栈的关键
     Go.AryLoop = function(ary){
         var last = ary.pop();
         unshift.call(ary,last);
         return ary;
     };
+    //Go.AryDart 同样是模拟队列, 栈的关键
     Go.AryDart = function(ary){
         var first = ary.shift();
         push.call(ary,first);
         return ary;
     };
-    //Go.PackAge非常重要!
+    //Go.AryUnique 数组去除重复
+    Go.AryUnique = function(ary) {
+        //支持数组内混杂数据的方式, 数字+字符串,均可以过滤
+        var b = {},
+            result = [];
+        for (var i = 0, l = ary.length; i < l; i++) {
+            if (!b[ary[i]]) {
+                b[ary[i]] = 1;
+                result.push(ary[i]);
+            }
+        }
+        b = null;
+        return result;
+    };
+
+    //Go.AryDuplicate 纯数字快速去除重复
+    Go.AryDuplicate = function(ary){
+    	//纯数值数组, 或者纯字符串数组. 不可混搭
+		ary.sort(function(a,b){ return a-b });
+		var i = ary.length-1, j = i-1;
+		for(;i;i--,j--){
+			if(ary[i]===ary[j]) ary.splice(i,1);
+		}
+		return ary;
+	};
+	//Go.AryRmVal 去除数组中指定的值
+	Go.AryRmVal = function(ary,val){
+        //在数组中删除指定的值
+        var result = [];
+        for(var i=0,l=ary.length; i<l;i++){
+            if(ary[i] !== val)  result.push(ary[i]);
+        }
+        return result;
+    }
+    //Go.PackAge 合并对象. 通常用于扩展时合并options 非常重要!
     Go.Package = function(oobj,fobj){
         //fobj 优先覆盖 oobj
-        //使用oobj来作为控制访问对象.
-        //千万不要使用fobj来作为控制访问对象.它只不过是个临时的合并对象
+        //最终使用 oobj 来作为控制访问对象,或者option对象.不要使用fobj.
+        //千万不要使用fobj来作为option对象.它只不过是个临时的合并对象
         for(var key in fobj){
             oobj[key] = fobj[key]
         }
         return oobj;
     };
+    //Go.ElemntChild 一个节点中的全部子节点, 不包括文本节点 和 script 节点
     Go.ElementChild = function(elm){
-        var result = [],
-            t = elm.childNodes;
-        for(var j = 0,k = t.length;j<k;j++){
-            if(t[j].nodeType===1){
-                //必须是个Element节点
-                push.call(result,t[j]);
-            }
-        }
+        var result = [];
+        Go.AryEach(elm.childNodes,function(e){
+        	//必须是个Element节点 防止得到 SCRIPT 标签
+        	if(e.nodeType===1 && e.nodeName!=="SCRIPT")
+                push.call(result,e);
+        })
         return result;
     };
+    //Go.TextChild 一个节点中的全部子文本节点. 不包括元素节点 和 script 节点
+    Go.TextChild = function(elm){
+    	var result = [];
+    	Go.AryEach(elm.childNodes,function(e){
+    		//必须是个Text文本节点 防止得到 SCRIPT 标签.
+    		//值得注意的是, Text文本节点是一个object类型,可以访问它的属性,而不是纯字符串 
+    		//其中 Text文本节点属性 nodeValue 是一个可以读写的属性, 记录了内部的文本字符串. 可以通过修改 nodeValue 来达到修改文本的目的
+    		if(e.nodeType === 3 && e.nodeName !== "SCRIPT")  
+    			push.call(result,e);
+    	});
+    	return result;
+    };
+    //Go.createElement 创建一个Element元素, 并且添加属性
     Go.createElement = function(elmname,profileOBJ){
         var elm = doc.createElement(elmname);
         if (profileOBJ && profileOBJ instanceof Object && profileOBJ !== broken) {
@@ -1470,6 +1522,7 @@
         }
         return elm;
     };
+    //Go.createText 创建一个Text文本节点 
     Go.createText = function(text){
         return doc.createTextNode(text);
     };
@@ -1554,7 +1607,6 @@
                 type:"text/javascript",
                 src:url
             });
-
             body.appendChild(scriptTag);
         })
     };
@@ -1564,6 +1616,158 @@
                 || doc.body.scrollTop
                 || 0;
     };
+
+    // @ JavaScript encoding and decoding
+    // @ -> HTMLencoding
+    // @ -> HTMLdecoding
+
+    var HTMLencodingReplaceObject = {
+    		'&':"&amp;",
+    		'>':"&gt;",
+    		'<':"&lt;",
+    		'"': '&quot;',
+        	"'": '&#x27;',
+        	'`': '&#x60;'
+    	},
+    	HTMLdecodingReplaceObject = {
+    		'&amp;':'&',
+    		'&gt;':'>',
+    		'&lt;':'<',
+    		'&quot;': '"',
+        	"&#x27;": "'",
+        	'&#x60;': '`'
+    	};
+
+    Go.replaceHTMLencode = function(tag){
+    	return HTMLencodingReplaceObject[tag] || tag;
+    }
+    Go.replaceHTMLdecode = function(code){
+    	return HTMLdecodingReplaceObject[code] || code;
+    }
+
+    Go.HTMLencode = function(htmlString){
+    	return htmlString.replace(/[&<">'](?:(amp|lt|quot|gt|#39);)?/g,Go.replaceHTMLencode);
+    };
+    Go.HTMLdecode = function(htmlencodeString){
+    	return htmlencodeString.replace(/&((g|l|quo)t|amp|#39);/g,Go.replaceHTMLdecode);
+    }
+
+    // @ Ghost JavaScript TempLate Engine
+    // @ call Go.template() building the js template
+    // @ Base on Underscore.js Template Engine  By Jeremy Ashkenas
+    // @ First Building Template
+    //			var tpl = Go.template(
+   	//				'<ul>'+
+	//					'<li>{{=name}}</li>'+
+	//					'<li>{{=time}}</li>'+
+	//					'<li>{{=score}}</li>'+
+	//				'</ul>'
+   	//			)
+    //	
+    //			data = { name:"Ghost",time:"2014.10.14",score:100};
+    //			
+    //			Go("DOM").insetHTML(tpl(data));
+    //
+    // @ even you can change the template rule Coding
+    // @ that you would rewrite [ Go.templateOption ] object [ evalute , interpolate , escape ] like that :
+    //		Go.templateOption = {
+    //			evaluate: /<\*([\s\S]+?)\*>/g,
+   	//			interpolate: /<\*=([\s\S]+?)\*>/g,
+   	//			escape: /<\*-([\s\S]+?)\*>/g
+    //	    }
+    //
+    //	--and then you can build template like :
+   	//				'<ul>'+
+	//					'<li><*=name*></li>'+
+	//					'<li><*=time*></li>'+
+	//					'<li><*=score*></li>'+
+	//				'</ul>'
+    //  --But the best option is default [ {{ }} , {{= }} , {{# }} ]
+    // @ evaluate : JavaScript function or expression
+    // @ interpolate : JavaScript variable
+    // @ escape : reject JavaScript inset XSS attack JavaScript Code
+
+    Go.keys = function(obj){
+        if(typeof obj !== 'object' && !obj) return [];
+        if(nativeKeys) return nativeKeys(obj);
+
+        var keys = [];
+        for(var key in obj) if(obj.hasOwnProperty(key)) push.call(keys,key);
+        return keys;
+    };
+
+    Go.escape = createEscaper(HTMLencodingReplaceObject);
+    //Building The Template Default Options 
+    Go.templateOption = {
+        evaluate    : /{{([\s\S]+?)}}/g,
+        interpolate : /{{=([\s\S]+?)}}/g,
+        escape      : /{{#([\s\S]+?)}}/g
+    };
+
+    var noMatch = /(.)^/,
+        escaper = /\\|'|\r|\n|\u2028|\u2029/g,
+        escapes = {
+            "'"     : "'",
+            "\\"    : "\\",
+            "\r"    : "r",
+            "\n"    : "n",
+            "\u2028": "u2028",
+            "\u2029": "u2029"
+        },
+        escapeChar = function(match){ return '\\' + escapes[match]; };
+
+    Go.template = function(text,option){
+        //composs options
+        option = Go.Package(Go.templateOption,option);
+
+        var index = 0;
+        var source = "_p+='";
+        var regGo = RegExp([
+            (option.escape || noMatch).source,
+            (option.interpolate || noMatch).source,
+            (option.evaluate || noMatch).source,
+            "$"
+        ].join('|'),'g');
+
+        text.replace(regGo, function(match,escape,interpolate,evaluate,offset){
+            //escaper HTML Tag Code like -> '<span> </div></span>'
+            //remember the index that find in text String
+            source += text.slice(index, offset).replace(escaper,escapeChar);
+            index = offset + match.length;
+
+            if (escape) {
+                source += "'+\n((_t=(" + escape + "))==null?'':Go.escape(_t))+\n'";
+            } else if (interpolate) {
+                source += "'+\n((_t=(" + interpolate + "))==null?'':_t)+\n'";
+            } else if (evaluate) {
+                source += "';\n" + evaluate + "\n_p+='";
+            }
+
+            return match; 
+        });
+
+        source += "';\n";
+
+        if(!option.variable) source = 'with(obj||{}){\n' +  source + '}\n';
+
+        source =  "var _t,_p='',_j = Array.prototype.join,print=function(){_p+=_j.call(arguments,'');};\n" + source + "return _p;\n";
+
+        //Complete Building JavaScript expression
+        //try to building the Function
+        try{ var render = new Function(option.variable||'obj','Go',source); }
+        catch(e){ e.source = source; throw e; }
+
+        //Precompile JavaScript Template Function
+        //the you build once template that use diff Data, not use diff to build function again
+        var template = function(data){
+            return render.call(this,data,Go);
+        };
+
+
+        return template;
+    };
+    //end For Ghost Template
+
 
     function OneBind(e, event, callback) {
         if (doc.addEventListener) {
@@ -1683,18 +1887,14 @@
     function getClass(elm, tag) {
         //惰性载入的函数设计方式
         if (doc.getElementsByClassName) {
+        	//HTML5的方法
             getClass = function (elm) {
-                var result = [],
-                    elms = doc.getElementsByClassName(elm);
-                Go.AryEach(elms,function(e){
-                    push.call(result,e);
-                });
-                return result;
-                //HTML5的方法
+                var elms = doc.getElementsByClassName(elm);
+                return Go.ListAry(elms);
             };
             return getClass(elm);
-        }
-        if (MSIE8 && doc.querySelector) { //IE8方法 比判断querySelector少3个字节.
+        } else if (MSIE8 && doc.querySelector) { 
+        //IE8方法 比判断querySelector少3个字节.
             getClass = function (elm) {
                 var result = [];
                 var elms = qSA("." + elm);
@@ -1704,7 +1904,8 @@
                 return result;
             };
             return getClass(elm);
-        } else { //兼容方法
+        } else { 
+        //兼容方法
             getClass = function (elm, tag) {
                 tag = tag || "*";
                 var result = {},
@@ -1723,11 +1924,11 @@
     }
 
     function createXHR() { //创建XHR请求
-        if (typeof XMLHttpRequest !== "undefined") {
+        if (XMLHttpRequest) {
             createXHR = function () {
                 return new XMLHttpRequest();
             }
-        } else if (typeof ActiveXObject !== 'undefined') {
+        } else if (ActiveXObject) {
             createXHR = function () {
                 if (typeof arguments.callee.activeXString != "string") {
                     var version = ['MSXML2.XMLHttp.6.0', 'MSXML2.XMLHttp.3.0', 'MSXML2.XMLHttp', 'Microsoft.XMLHTTP'];
@@ -1789,45 +1990,6 @@
             return "";
     }
 
-    function Unique(ary) {
-        //数组去除重复.
-        var b = {},
-            result = [];
-        for (var i = 0, l = ary.length; i < l; i++) {
-            if (!b[ary[i]]) {
-                b[ary[i]] = 1;
-                result.push(ary[i]);
-            }
-        }
-        b = null;
-        return result;
-    }
-
-    function RemoveDuplicate(ary) {
-        //数组拆分成字符串, 然后删除相同的元素
-        //比如 1,1,2,2,3,4,4,5
-        //最后只剩下3,5 重复的都要被删除
-        var reg = /(\w+\,)\1/g;
-        var result = ary.sort();
-        result = result.join(",").replace(reg, "").split(",");
-        var len = result.length - 1;
-        if (result[len] == result[len - 1]) {
-            result.pop();
-            result.pop();
-        }
-        return result;
-    }
-
-    function RemoveArrayValue(ary,val){
-        //在数组中删除指定的值
-        var result = [];
-        for(var i=0,l=ary.length; i<l;i++){
-            if(ary[i] !== val){
-                result.push(ary[i]);
-            }
-        }
-        return result;
-    }
     function equalTagName(elm,TagString){
         TagString = TagString.toUpperCase();
         return elm.nodeName === TagString;
@@ -1855,8 +2017,23 @@
         v = parseInt(v);
         return isNaN(v) ? 0 : v;
     }
+
     function removeNode(e){
         e.parentNode.removeChild(e);
+    }
+
+    function createEscaper(map){
+        var escaper = function(match){
+            return map[match];
+        };
+
+        var source = '(?:' + Go.keys(map).join('|') + ')';
+        var testRegexp = RegExp(source);
+        var replaceRegexp = RegExp(source, 'g');
+        return function(string) {
+            string = string == null ? '' : '' + string;
+            return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+        };
     }
 
     //ActionScript 3.0 Tween 动画算法
@@ -2018,6 +2195,7 @@
             }
         }
     };
+
     global.Go = global.Ghost = Go;
     return Go;
 }));
