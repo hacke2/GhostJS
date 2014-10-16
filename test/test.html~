@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Ghost Template</title>
-	<script type="text/javascript" src="../G 0.0.3.js"></script>
+	<script type="text/javascript" src="..\G 0.0.3.js"></script>
 </head>
 <body>
 <div id="list">0</div>
