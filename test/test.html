@@ -14,8 +14,8 @@
 <div class="list"></div>
 <div class="list"></div>
    <script type="text/javascript">
-		Go(function(){
-			var tpl = Go.template(
+		G(function(){
+			var tpl = G.template(
 					'<ul>'+
 					'<li>{{=name}}</li>'+
 					'<li>{{=date}}</li>'+
@@ -29,9 +29,9 @@
 			};
 
 
-			Go("#list").insetHTML(tpl(data));
-			Go(".list").insetHTML(tpl({ name:"FaiSco",date:"2010",score:"100"}));
-					Go("#list").rmNode();			
+		G("#list").insetHTML(tpl(data));
+			G(".list").insetHTML(tpl({ name:"FaiSco",date:"2010",score:"100"}));
+			G("#list").rmNode();			
 		});
    </script>     
 </body>
