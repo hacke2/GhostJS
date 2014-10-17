@@ -25,11 +25,11 @@
 
 }(typeof window !== "undefined" ? window : this, function(BrowserGhost) {
 
-    var VERSION = "G 0.0.3",
+    var VERSION 	=  "G 0.0.3",
 
-        global = window,
-        doc = document,
-        userAgent = global.navigator.userAgent;
+        global 		=  window,
+        doc 		=  document,
+        userAgent 	=  global.navigator.userAgent;
     /*
      * G
      * @ 核心入口
@@ -113,42 +113,42 @@
      * @ 主要成员G创建之后,
      * @ 开始初始化
      */
-    var broken = {},
+    var broken 		= {},
 
-        G_Array = [],
-        G_Object = {},
-        G_String = " ",
-        G_Number = 1,
+        G_Array	 	= [],
+        G_Object 	= {},
+        G_String 	= " ",
+        G_Number 	= 1,
 
         //Object Method
-        hasOwnProperty = G_Object.hasOwnProperty,
+        hasOwnProperty 		=	 G_Object.hasOwnProperty,
         //Array Method
-        push = G_Array.push,
-        unshift = G_Array.unshift,
-        slice = G_Array.slice,
-        splice = G_Array.splice,
-        join = G_Array.join,
-        concat = G_Array.concat,
+        push 				=	 G_Array.push,
+        unshift 			=	 G_Array.unshift,
+        slice 				=	 G_Array.slice,
+        splice 				=	 G_Array.splice,
+        join 				=	 G_Array.join,
+        concat 				=	 G_Array.concat,
         //ECMAScript 5
-        nativeKeys = Object.keys,
-        nativeMap = G_Array.map,
-        nativeForEach = G_Array.forEach,
-        nativeFilter = G_Array.filter,
-        nativeReduce = G_Array.reduce,
-        nativeReduceRight = G_Array.reduceRight,
-        nativeIsArray = Array.isArray,
+        nativeKeys 			=	 Object.keys,
+        nativeMap 			=	 G_Array.map,
+        nativeForEach 		=	 G_Array.forEach,
+        nativeFilter 		=	 G_Array.filter,
+        nativeReduce 		=	 G_Array.reduce,
+        nativeReduceRight 	=	 G_Array.reduceRight,
+        nativeIsArray 		=	 Array.isArray,
         //ECMAScript 6
-        nativeFill = G_Array.fill,
+        nativeFill 			=	 G_Array.fill,
         //Other
-        nativeToString = Object.prototype.toString;
+        nativeToString 		=	 Object.prototype.toString;
 
 
-    var isId = /^#\w+/,
-        isClass = /^(\.)(\w+)/,
-        isTag = /^\w+/,
-        isAll = /^\*$/,
-        advSelector = /.+>.+/g,
-        qSA = doc.querySelectorAll;
+    var isId   				= /^#\w+/,
+        isClass   			= /^(\.)(\w+)/,
+        isTag   			= /^\w+/,
+        isAll   			= /^\*$/,
+        advSelector   		= /.+>.+/g,
+        qSA   				= doc.querySelectorAll;
 
     /*
      * NoSQL DataBase
@@ -172,8 +172,8 @@
      * @ NoSQL 存储容器
      * @ NoSQLStack 容器内存状态
      */
-    G.NoSQL = {};
-    G.NoSQLStack = 0;
+    G.NoSQL 		= {};
+    G.NoSQLStack 	= 0;
 
     /*
      * GhostStack
@@ -183,8 +183,8 @@
      * @ 可以通过G.PaddingStack 来扩充缓存的上限,一般默认都是3
      * @ 内部机制 G.pushStack 想缓存中推入选择器
      */
-    G.GhostStack = [];
-    G.pushStack = function(_G) {
+    G.GhostStack 	= [];
+    G.pushStack 	= function(_G) {
         var Stack_Status = G.GhostStack.length;
         if (Stack_Status >= 3)
             G.GhostStack.shift();
@@ -197,16 +197,16 @@
      * @ userAgent 浏览器嗅探
      * @ userAgent 不推荐使用
      */
-    G._NOOP = function() {};
+    G._NOOP 	    = function() {};
 
     //Browser UserAgent Information
-    var MSIE8 = !-[1, ];
-    G.isIE = userAgent.indexOf("Trident") > 0;
-    G.isIE6 = userAgent.indexOf("MSIE 6.0") > 0;
-    G.isIE7 = userAgent.indexOf("MSIE 7.0") > 0;
-    G.isIE8 = userAgent.indexOf("MSIE 8.0") > 0;
-    G.isChrome = userAgent.indexOf("Chrome") > 0;
-    G.isFireFox = userAgent.indexOf("Firefox") > 0;
+    var MSIE8 		= !-[1, ];
+    G.isIE 			= userAgent.indexOf("Trident") > 0;
+    G.isIE6 		= userAgent.indexOf("MSIE 6.0") > 0;
+    G.isIE7 		= userAgent.indexOf("MSIE 7.0") > 0;
+    G.isIE8 		= userAgent.indexOf("MSIE 8.0") > 0;
+    G.isChrome 		= userAgent.indexOf("Chrome") > 0;
+    G.isFireFox 	= userAgent.indexOf("Firefox") > 0;
 
 
     /*
@@ -1752,15 +1752,15 @@
         });
 
         source += "';\n";
-
+       
         if (!option.variable) source = 'with(obj||{}){\n' + source + '}\n';
 
         source = "var _t,_p='',_j = Array.prototype.join,print=function(){_p+=_j.call(arguments,'');};\n" + source + "return _p;\n";
 
         //Complete Building JavaScript expression
-        //try to building the Function
+        //try to building the Function. That you can use the G _ Ghost Method to Parse Data
         try {
-            var render = new Function(option.variable || 'obj', 'G', source);
+            var render = new Function(option.variable||'obj','G',source);
         } catch (e) {
             e.source = source;
             throw e;

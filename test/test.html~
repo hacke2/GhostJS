@@ -3,35 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Ghost Template</title>
-	<script type="text/javascript" src="..\G 0.0.3.js"></script>
+	<script type="text/javascript" src="../G 0.0.3.js"></script>
 </head>
 <body>
+<button id="btn">Click</button>
 <div id="list">0</div>
-<div class="list"></div>
-<div class="list"></div>
-<div class="list"></div>
-<div class="list"></div>
-<div class="list"></div>
-<div class="list"></div>
+<div class="divblock"></div>
+<div class="divblock"></div>
+<div class="divblock"></div>
+<div class="divblock"></div>
+<div class="divblock"></div>
+<div class="divblock"></div>
    <script type="text/javascript">
 		G(function(){
-			var tpl = G.template(
-					'<ul>'+
-					'<li>{{=name}}</li>'+
-					'<li>{{=date}}</li>'+
-					'<li>{{=score}}</li>'
-			);
 
-			var data ={
-				name:"Demon",
-				date:"2014",
-				score:"100"
-			};
+			var tplBuilding =
+		   		 ''	
+				+'<ol>'
+				+'{{ data.list = data.list.split(","); }}'
+				+'{{ G.AryEach(data.list,function(item){  }}'
+				+		'<li>{{=item}}</li>'		
+				+'{{ }); }}'
+				+'</ol>'	
+			var tpl = G.template(tplBuilding,{ variable:"data" });
 
-
-		G("#list").insetHTML(tpl(data));
-			G(".list").insetHTML(tpl({ name:"FaiSco",date:"2010",score:"100"}));
-			G("#list").rmNode();			
+			G("#btn").bind("click",function(){
+				G.JSONP({
+					url		:	"http://jsfiddle.net/echo/jsonp",
+					data	:	{ list: "JavaScript,C,C++,JAVA,Dart,Lisp,PHP" },
+					success	:	function(data){ G(".divblock").insetHTML(tpl(data)) } 
+				});
+			});
+						
 		});
    </script>     
 </body>
