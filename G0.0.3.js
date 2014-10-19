@@ -1259,7 +1259,7 @@
 		return false;
 	};
     //G.AryMap 数组映射.并且将数值压入另外一个数组,而不改变原来的数组
-    G.AryMap = function(ary, func) {
+    G.ListMap = function(ary, func) {
         var map = [];
         if (G.isArray(ary))
             if (nativeMap)
@@ -1278,7 +1278,7 @@
     // ECMAScript 5 JavaScript 1.8 中拥有reduce的方法, IE9以上的浏览器都实现了标准.reduce更加快
     // 可以传入对象, 对Object进行了扩展
     // test -> G.AryReduce([1,2,3,4,5],function(a,b){ return a*b },1) -> (((1*2)*3)*4)*5) = 120
-    G.AryReduce = function(ary, func, refer) {
+    G.ListReduce = function(ary, func, refer) {
         //refer必须传入,并且需要有类型,因为refer就是reduce所有动作的依据
         if (G.isArray(ary)) {
             //nativeReduce -> ary.reduce(func(firstValue,nextValue,index,thisAry))
@@ -1295,7 +1295,7 @@
         return refer;
     };
     // G.AryReduceRight 为上函数的逆向版本,则意思是从右到左.
-    G.AryReduceRight = function(ary, func, refer) {
+    G.ListReduceRight = function(ary, func, refer) {
         if (G.isArray(ary))
             //nativeReduceRight -> ary.reduceRight(func(lastValue,prevValue,index,thisAry))
             if (nativeReduceRight)
@@ -1440,30 +1440,136 @@
     };
 	//G.AryFindIndex ECMAScript 6
 	G.AryFindIndex = function(ary,func){
-        if(G.isArray(ary)) {
+        if(G.isArray(ary))
             for (var i = 0, l = ary.length; i < l; i++)
                 if (func(ary[i], i, ary)) return i;
-        }
-        else if(G.isObject(ary)) {
+        else if(G.isObject(ary))
             for (var key in ary)
-                if (func(ary[key], key, ary))
-					return key;
-        }
+                if (func(ary[key], key, ary)) return key;
 	};
+	//G.ListContains if find the value, then return Boolean true
+	G.ListContains = function(list,value){
+		if(G.isArray(list))
+			for(var i=list.length;i--;)
+				if(list[i] === value) return true	
+		else if(G.isObject(list))
+			for(var key in list)
+				if(list[key] === value) return true
+
+		return false
+	};
+	
+	//G.ListHook make function hook to every list item
+	G.ListHook = function(list,hook){
+		var args = slice.call(arguments,2),
+			isfunc = G.isFunction(hook);
+		return G.ListMap(list,function(value){
+			return (isfunc ? hook : value[hook]).apply(value,args);
+		})
+	};
+
+	//G.ListPluck extraction the obj[keys],value,than return the value Array []
+	//
+	//G.ListPluck([ {name:1,two:2}, {name:2,two:3}, {name:3,two:4}, {name:4,two:5}],'name')
+	// -> [1, 2, 3, 4]
+	//G.ListPluck([ {name:1,two:2}, {name:2,two:3}, {name:3,two:4}, {name:4,two:5}],'two')
+	// -> [2, 3, 4, 5]
+	//G.ListPluck({ key1:{name:1,two:2}, key2:{name:2,two:3}, key3:{name:3,two:4}, key4:{name:4,two:5}},'name')
+	// -> [1, 2, 3, 4]
+	//G.ListPluck({ key1:{name:1,two:2}, key2:{name:2,two:3}, key3:{name:3,two:4}, key4:{name:4,two:5}},'two')
+	// -> [2, 3, 4, 5]
+	G.ListPluck = function(list,mapkey){
+		var result = [];
+		if(G.isArray(list))
+			G.AryEach(list,function(item){
+				G.ObjEach(item,function(val,key){ if(key==mapkey) result.push(val) })			
+			});
+		else if(G.isObject(list))
+			G.ObjEach(list,function(obj){
+				G.ObjEach(obj,function(val,key){ if(key==mapkey) result.push(val) })
+			});
+		return result
+	};
+
+	//G.AryGroup part of Array by your Method , return final Object { }
+	//
+	//G.AryGroup( ["one","two","three","four","five","six"] , "length" )
+	// -> { "3":["one","two","six"], "4":["four","five"], "5":["three"] }
+	//
+	//G.AryGroup([1.3, 1.6, 2.1, 2.4, 2.4, 2.6, 3.0, 3.8, 4.2], function(num){ return Math.floor(num); })
+	// -> {  1 :[1.3, 1.6],  2 :[2.1, 2.4, 2.4, 2.6],  3: [3.0,3.8],  4 : [4.2]  }
+	//
+	//G.AryGroup(["Given","JayXon",1,33,"G","1",4,"Ghost"],function(val){ 
+	//		return G.isNumber(val) ? "number" : "string"; 
+	//});
+	// -> { "number": [1,33,4] , "string": ["Given","JayXon","G","1","Ghost"] }
+	G.AryGroup = function(ary,by){
+		var groupObj = {},
+			isByFunc = G.isFunction(by);
+		G.AryEach(ary,function(val,index,ary){
+			var key = isByFunc ? by(val) : val[by];
+			if(!groupObj[key])
+				//init object key
+				groupObj[key] = [val];
+			else if(groupObj.hasOwnProperty(key))
+				//that you have property . dirct push it in grouplist
+				groupObj[key].push(val)
+		});
+		return groupObj;
+	};
+
+	//G.AryGroupByKey Base on G.AryGroup .
+	//But it Just Useful [{},{},{},{},{}] data struct
+	G.AryGroupByKey = function(ary,keyName){
+		return G.AryGroup(ary,keyName.toString());
+	};
+	
+	//Made Object's value to aryList .
+	G.ObjtoAry = function(obj){
+		var keys = G.keys(obj),
+			len  = keys.length,
+			ary  = Array(len);
+		for(var i=len;i--;)
+			ary[i] = obj[keys[i]];
+		return ary;
+	};
+	// AryList DisOrder
+	// Shuffle a collection, using the modern version of the
+ 	// [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
+	G.AryDisorder = function(obj){
+		var setting = obj && obj.length === +obj.length ? obj : G.ObjtoAry(obj),
+			length  = setting.length,
+			disorder= Array(length);
+		for(var index =0,rand; index<length; index++){
+			rand = G.Random(0,index);
+			if(rand !== index)
+				disorder[index] = disorder[rand];
+			disorder[rand] = setting[index];
+		}
+		return disorder;
+	};
+
 	//G.Aryof ECMAScript 6
 	G.AryOf = function(){
 		if(!arguments.length) return [];
 		return slice.call(arguments);
 	};
 
+	G.Random = function(min,max){
+		if(max == null){
+			max = min;
+			min = 0;
+		}
+		return min + Math.floor(Math.random()*(max-min+1));			
+	}
+	
     //G.PackAge 合并对象. 通常用于扩展时合并options 非常重要!
     G.Package = function(oobj, fobj) {
         //fobj 优先覆盖 oobj
         //最终使用 oobj 来作为控制访问对象,或者option对象.不要使用fobj.
         //千万不要使用fobj来作为option对象.它只不过是个临时的合并对象
-        for (var key in fobj) {
+        for (var key in fobj)
             oobj[key] = fobj[key]
-        }
         return oobj;
     };
     //G.ElemntChild 一个节点中的全部子节点, 不包括文本节点 和 script 节点

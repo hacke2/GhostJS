@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Ghost Template</title>
-	<script type="text/javascript" src="../G 0.0.3.js"></script>
+	<script type="text/javascript" src="../G0.0.3.js"></script>
 </head>
 <body>
 <button id="btn">Click</button>
@@ -32,10 +32,11 @@
 				G.JSONP({
 					url		:	"http://jsfiddle.net/echo/jsonp",
 					data	:	{ list: "JavaScript,C,C++,JAVA,Dart,Lisp,PHP" },
+					fail 	:   function(e){ alert(e); },
 					success	:	function(data){ G("#list .divblock").insetHTML(tpl(data)) } 
 				});
 			});
-						
+				
 		});
    </script>     
 </body>
