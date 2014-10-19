@@ -1,3 +1,0 @@
-ADD new Git File
-
-Make a file Nice read for git
