@@ -908,19 +908,10 @@
             }
         },
         stAttr: function(attrName, attrValue) {
-            if (typeof attrName === 'object' && attrName instanceof Object) {
-                /*
-                 {
-                 id:"xxx",
-                 className:"xxx"
-                 href:"xxxx"
-                 data_xx: xxxx
-                 }
-                 */
+            if (typeof attrName === 'object') {
                 this.each(function(e) {
-                    for (var key in attrName) {
+                    for (var key in attrName)
                         e.setAttribute(key, attrName[key]);
-                    }
                 });
                 return this;
             }
@@ -930,8 +921,7 @@
                 return this;
             }
             this.each(function(e) {
-                e.setAttribute(attrName, attrValue);
-            });
+                e.setAttribute(attrName, attrValue);           });
 
             return this;
         },
