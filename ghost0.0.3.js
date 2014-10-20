@@ -18,24 +18,24 @@
  *
  */
 
-(function(Global, alreadyG) {
+(function(Global, alreadyGO) {
 
-    if (!alreadyG(Global))
-        throw new Error("GhostJS Require Browser G");
+    if (!alreadyGO(Global))
+        throw new Error("GhostJS Require Browser Go");
 
 }(typeof window !== "undefined" ? window : this, function(BrowserGhost) {
 
-    var VERSION 	=  "G 0.0.3",
+    var VERSION 	=  "Ghost 0.0.3",
 
         global 		=  window,
         doc 		=  document,
         userAgent 	=  global.navigator.userAgent;
     /*
-     * G
+     * Go
      * @ 核心入口
      * @ 最终接入window
      */
-    var G = function(obj) {
+    var Go = function(obj) {
         if (obj instanceof Function) {
 
             /*
@@ -48,7 +48,7 @@
              * 在DOM结构绘制完毕就会被加载.
              *
              * G(function(){
-             *   G.insetScript(script)
+             *   Go.insetScript(script)
              * });
              *
              *   @ 尾部插入脚本而不会阻塞DOM的绘制
@@ -56,7 +56,7 @@
              *   @ 尾部加载js控制样式容易造成回流.
              *   @ 尽可控制单个内层DOM.造成重绘,而不是回流.
              *
-             *   @ 通过G.insetScript插入的脚本默认需要在闭包中执行
+             *   @ 通过Go.insetScript插入的脚本默认需要在闭包中执行
              *	@ 无法在insetScript插入的脚本中增加 G(function(){ -- code -- }) 装载逻辑, 因为在插入DOM结构中时. DOM已经完全绘制完毕
              *
              */
@@ -99,10 +99,10 @@
                     }
                 }
             }
-        } else if ((obj.nodeType && obj.nodeType == 1) || !(this instanceof G)) {
+        } else if ((obj.nodeType && obj.nodeType == 1) || !(this instanceof Go)) {
             //如果不是原始类型的G 或者是一个DOM节点. 则通过 _G 进行包装
             return new _G(obj);
-        } else if (obj instanceof G || obj instanceof _G) {
+        } else if (obj instanceof Go || obj instanceof _G) {
             //instancof G 或者 _G 则不做任何操作.
             return obj;
         }
@@ -153,7 +153,7 @@
     /*
      * NoSQL DataBase
      * @ NoSQL 事件记录
-     * @ 只要有DOM元素是通过 G(DOM).bind(event,callback) 的方式绑定了事件.就会在G.NoSQL保存对应的记录
+     * @ 只要有DOM元素是通过 G(DOM).bind(event,callback) 的方式绑定了事件.就会在Go.NoSQL保存对应的记录
      * @ 在NoSQL中有事件记录的DOM元素
      *       1.可以通过unbind来移除指定绑定函数,
      *           [    ** example **
@@ -172,41 +172,41 @@
      * @ NoSQL 存储容器
      * @ NoSQLStack 容器内存状态
      */
-    G.NoSQL 		= {};
-    G.NoSQLStack 	= 0;
+    Go.NoSQL 		= {};
+    Go.NoSQLStack 	= 0;
 
     /*
      * GhostStack
      * @ 选择器缓存机制
      * @ 利用缓存极大降低选择器重复选择同一元素时候带来的性能损耗
      * @ 缓存默认存储前3次操作的选择器
-     * @ 可以通过G.PaddingStack 来扩充缓存的上限,一般默认都是3
-     * @ 内部机制 G.pushStack 想缓存中推入选择器
+     * @ 可以通过Go.PaddingStack 来扩充缓存的上限,一般默认都是3
+     * @ 内部机制 Go.pushStack 想缓存中推入选择器
      */
-    G.GhostStack 	= [];
-    G.pushStack 	= function(_G) {
-        var Stack_Status = G.GhostStack.length;
+    Go.GhostStack 	= [];
+    Go.pushStack 	= function(_G) {
+        var Stack_Status = Go.GhostStack.length;
         if (Stack_Status >= 3)
-            G.GhostStack.shift();
-        push.call(G.GhostStack, _G);
+            Go.GhostStack.shift();
+        push.call(Go.GhostStack, _G);
     };
 
     /*
-     * G._NOOP
+     * Go._NOOP
      * @ 空函数,什么也不做,方便Ghost内部和外部扩展调用.让外部废弃函数都指向_NOOP来避免重复创建无用匿名函数.
      * @ userAgent 浏览器嗅探
      * @ userAgent 不推荐使用
      */
-    G._NOOP 	    = function() {};
+    Go._NOOP 	    = function() {};
 
     //Browser UserAgent Information
     var MSIE8 		= !-[1, ];
-    G.isIE 			= userAgent.indexOf("Trident") > 0;
-    G.isIE6 		= userAgent.indexOf("MSIE 6.0") > 0;
-    G.isIE7 		= userAgent.indexOf("MSIE 7.0") > 0;
-    G.isIE8 		= userAgent.indexOf("MSIE 8.0") > 0;
-    G.isChrome 		= userAgent.indexOf("Chrome") > 0;
-    G.isFireFox 	= userAgent.indexOf("Firefox") > 0;
+    Go.isIE 			= userAgent.indexOf("Trident") > 0;
+    Go.isIE6 		= userAgent.indexOf("MSIE 6.0") > 0;
+    Go.isIE7 		= userAgent.indexOf("MSIE 7.0") > 0;
+    Go.isIE8 		= userAgent.indexOf("MSIE 8.0") > 0;
+    Go.isChrome 		= userAgent.indexOf("Chrome") > 0;
+    Go.isFireFox 	= userAgent.indexOf("Firefox") > 0;
 
 
     /*
@@ -223,11 +223,11 @@
         var _G_self = this;
         _G_self.selector = [];
 
-        //G.GhostStack中寻找缓存
+        //Go.GhostStack中寻找缓存
         var chache_status = false,
             chache = null;
 
-        G.AryEach(G.GhostStack, function(e) {
+        Go.AryEach(Go.GhostStack, function(e) {
             //通过遍历e的选择器方法来判断是否和缓存中的_G一致
             if (e.selectMethod === elm) {
                 chache_status = true;
@@ -247,19 +247,19 @@
                 _G_self.selectMethod = elm;
                 _G_self.length = 1;
 
-                G.pushStack(_G_self);
+                Go.pushStack(_G_self);
 
             } else {
                 _G_self.selectMethod = elm.toString();
                 elm = _G_self.selectMethod.split(" ");
 
-                G.AryEach(elm, function(e) {
+                Go.AryEach(elm, function(e) {
                     _G_self.selector = concat.call(_G_self.selector, GhostSelector(e));
                 });
 
                 //选择器最终包含元素的数目
                 this.length = _G_self.selector.length;
-                G.pushStack(_G_self);
+                Go.pushStack(_G_self);
             }
             return _G_self;
         }
@@ -285,7 +285,7 @@
             partfirst = GhostSelector(partfirst);
 
             var result = [],
-                model = G._NOOP;
+                model = Go._NOOP;
             if (isTag.test(selectorString)) {
                 model = equalTagName;
             } else if (isClass.test(selectorString)) {
@@ -293,11 +293,11 @@
                 model = hasClass;
             }
 
-            G.AryEach(partfirst, function(val) {
+            Go.AryEach(partfirst, function(val) {
                 //先把part1选择到的部分每个元素的子元素全部挑选出来出来
-                result = result.concat(G.ElementChild(val));
+                result = result.concat(Go.ElementChild(val));
             });
-            G.AryEach(result, function(val) {
+            Go.AryEach(result, function(val) {
                 //根据匹配模式判定是Tag 还是 Class
                 //然后比较,子元素中如果tagName 或 className和selectorString匹配.就将它push到结果中.
                 if (model(val, selectorString)) {
@@ -317,7 +317,7 @@
         } else {
             // prevResult part2 elms
             var result = [],
-                model = G._NOOP;
+                model = Go._NOOP;
 
             var NextPartSelector = elmstr[0]; // part3
             if (isTag.test(NextPartSelector)) {
@@ -326,11 +326,11 @@
                 NextPartSelector = NextPartSelector.substr(1);
                 model = hasClass;
             }
-            G.AryEach(prevResult, function(val) {
-                result = result.concat(G.ElementChild(val));
+            Go.AryEach(prevResult, function(val) {
+                result = result.concat(Go.ElementChild(val));
             });
             prevResult = [];
-            G.AryEach(result, function(val) {
+            Go.AryEach(result, function(val) {
                 if (model(val, NextPartSelector)) {
                     push.call(prevResult, val);
                 }
@@ -358,7 +358,7 @@
         else {
             //普通选择器
             if (isTag.test(elmstr))
-                return G.ListAry(doc.getElementsByTagName(elmstr));
+                return Go.ListAry(doc.getElementsByTagName(elmstr));
             else if (isId.test(elmstr)) {
                 var result = [];
                 push.call(result, doc.getElementById(elmstr.substr(1)));
@@ -366,7 +366,7 @@
             } else if (isClass.test(elmstr))
                 return getClass(elmstr.substr(1));
             else if (isAll.test(elmstr))
-                return G.ListAry(doc.getElementsByTagName("*"));
+                return Go.ListAry(doc.getElementsByTagName("*"));
         }
     }
 
@@ -376,7 +376,7 @@
      * @ 所有扩展方法都是基于 _G.selector. 也就是基于DOM
      * @ 本质是操作DOM元素
      */
-    G.Extend = _G.prototype = {
+    Go.Extend = _G.prototype = {
         constructor: _G,
 
         each: function(iterator, context) {
@@ -534,7 +534,7 @@
             this.prevSeletorMethod = this.selectMethod;
             this.selectMethod = this.selectMethod + " +fix";
 
-            this.selector = G.AryFilter(this.selector, func);
+            this.selector = Go.AryFilter(this.selector, func);
             this.length = this.selector.length;
 
             return this;
@@ -580,7 +580,7 @@
             this.prevSeletorMethod = this.selectMethod;
             this.selectMethod = this.selectMethod + " +next";
 
-            G.AryEach(self, function(e) {
+            Go.AryEach(self, function(e) {
                 var info = false;
                 e = e.nextSibling;
                 while (!info) {
@@ -614,7 +614,7 @@
             this.prevSeletorMethod = this.selectMethod;
             this.selectMethod = this.selectMethod + " +prev";
 
-            G.AryEach(self, function(e) {
+            Go.AryEach(self, function(e) {
                 var info = false;
                 e = e.previousSibling;
                 while (!info) {
@@ -651,9 +651,9 @@
             this.prevSeletorMethod = this.selectMethod;
             this.selectMethod = this.selectMethod + " +siblings";
 
-            G.AryEach(self, function(e) {
-                var eParentChild = G.ElementChild(e.parentNode);
-                siblings = concat.call(siblings, G.AryFilter(eParentChild, function(elm) {
+            Go.AryEach(self, function(e) {
+                var eParentChild = Go.ElementChild(e.parentNode);
+                siblings = concat.call(siblings, Go.AryFilter(eParentChild, function(elm) {
                     return (elm !== e && elm.nodeName !== "SCRIPT");
                 }));
                 //避免选择到script
@@ -677,8 +677,8 @@
             this.prevSeletorMethod = this.selectMethod;
             this.selectMethod = this.selectMethod + " +warp";
 
-            G.AryEach(self, function(e) {
-                warp = concat.call(warp, G.ElementChild(e))
+            Go.AryEach(self, function(e) {
+                warp = concat.call(warp, Go.ElementChild(e))
             });
 
             this.length = warp.length;
@@ -728,7 +728,7 @@
              * @ 阻塞JavaScript 线程 time时间.阻塞结束后立马执行回调函数
              * @ 慎用
              */
-            callback = callback || G._NOOP;
+            callback = callback || Go._NOOP;
             var timeSleep = new Date();
             var now = null;
             do {
@@ -748,10 +748,10 @@
              *
              */
             var _trash = this;
-            //trash 同样会清除掉G.GhostStack中的缓存.而下次构建选择器的时候则需要重新构建.而不是在缓存中找到它
-            G.AryEach(G.GhostStack, function(_G, index) {
+            //trash 同样会清除掉Go.GhostStack中的缓存.而下次构建选择器的时候则需要重新构建.而不是在缓存中找到它
+            Go.AryEach(Go.GhostStack, function(_G, index) {
                 if (_G.selectMethod === _trash.selectMethod) {
-                    G.GhostStack.splice(index);
+                    Go.GhostStack.splice(index);
                 }
             });
             setTimeout(function() {
@@ -767,7 +767,7 @@
             /*
              * bind
              * @ 给元素批量绑定事件
-             * @ G.NoSQL 写入事件标记
+             * @ Go.NoSQL 写入事件标记
              */
             this.each(function(e) {
                 BindALL(e, event, callback);
@@ -842,12 +842,12 @@
                     return;
                 }
                 if (hasClass(e, className)) {
-                    var newClass = G.PaddingString(e.className.replace(/[\t\r\n]/g, " "));
-                    var checkClass = new RegExp(G.PaddingString(className), "gm");
+                    var newClass = Go.PaddingString(e.className.replace(/[\t\r\n]/g, " "));
+                    var checkClass = new RegExp(Go.PaddingString(className), "gm");
                     if (hasClass(e, className)) {
                         newClass = newClass.replace(checkClass, " ");
                     }
-                    e.className = G.Trim(newClass);
+                    e.className = Go.Trim(newClass);
                 } else if (!className) {
                     e.className = "";
                 }
@@ -863,12 +863,12 @@
                 var paramClass = className;
                 if (paramClass) {
                     if (hasClass(e, paramClass)) {
-                        var newClass = G.PaddingString(e.className.replace(/[\t\r\n]/g, " "));
-                        var checkClass = new RegExp(G.PaddingString(paramClass), "gm");
+                        var newClass = Go.PaddingString(e.className.replace(/[\t\r\n]/g, " "));
+                        var checkClass = new RegExp(Go.PaddingString(paramClass), "gm");
                         if (hasClass(e, className)) {
                             newClass = newClass.replace(checkClass, " ");
                         }
-                        e.className = G.Trim(newClass);
+                        e.className = Go.Trim(newClass);
                     } else {
                         e.className += (e.className ? " " : "") + className;
                     }
@@ -898,7 +898,7 @@
                 styleName = styleName.split("-");
 
                 push.call(styleString, styleName.shift());
-                G.AryEach(styleName, function(e) {
+                Go.AryEach(styleName, function(e) {
                     push.call(styleString, upperCaseFirst(e))
                 });
 
@@ -950,7 +950,7 @@
             //unit是必须传入的
             t = t || 2;
             d = d || 200;
-            callback = callback || G._NOOP;
+            callback = callback || Go._NOOP;
             this.each(function(e) {
                 for (var i in profile) {
                     (function(i) {
@@ -976,7 +976,7 @@
         },
 
         fdIn: function(time, opaci, callBack) {
-            callBack = callBack || G._NOOP;
+            callBack = callBack || Go._NOOP;
             time = time || 300;
             this.each(function(e) {
                 e.style.display = "block";
@@ -987,8 +987,8 @@
 
                 function queue() {
                     th += 2;
-                    e.style.opacity = Math.round(G.Tween.Linear(th, 0, target, time) * 10) / 10;
-                    e.style.filter = 'alpha(opacity=' + G.Tween.Linear(th, 0, IEtarget, time) + ')';
+                    e.style.opacity = Math.round(Go.Tween.Linear(th, 0, target, time) * 10) / 10;
+                    e.style.filter = 'alpha(opacity=' + Go.Tween.Linear(th, 0, IEtarget, time) + ')';
                     if (th < time) {
                         setTimeout(queue, 30);
                     } else {
@@ -1001,7 +1001,7 @@
         },
 
         fdOut: function(time, callBack) {
-            callBack = callBack || G._NOOP
+            callBack = callBack || Go._NOOP
             time = time || 300;
             this.each(function(e) {
                 var th = 0,
@@ -1011,8 +1011,8 @@
 
                 function queue() {
                     th += 2;
-                    e.style.opacity = Math.round(G.Tween.Linear(th, opcity, -opcity, time) * 10) / 10;
-                    e.style.filter = "alpha(opacity=" + G.Tween.Linear(th, IEopcity, -IEopcity, time) + ")";
+                    e.style.opacity = Math.round(Go.Tween.Linear(th, opcity, -opcity, time) * 10) / 10;
+                    e.style.filter = "alpha(opacity=" + Go.Tween.Linear(th, IEopcity, -IEopcity, time) + ")";
                     if (th < time) {
                         setTimeout(queue, 30);
                     } else {
@@ -1077,7 +1077,7 @@
             var TargetlastElm = this.selector[0];
             if (typeof elms === 'object' && elms instanceof Array) {
                 //包含了原生Dom的数组
-                G.AryEach(elms, function(e) {
+                Go.AryEach(elms, function(e) {
                     TargetlastElm.appendChild(e);
                 });
 
@@ -1113,7 +1113,7 @@
             return this.selector[0].offsetHeight;
         },
         gtPos: function() {
-            return G.getPosition(this.selector[0]);
+            return Go.getPosition(this.selector[0]);
         },
         scTo: function(scrollTime) {
             var _G = this;
@@ -1121,8 +1121,8 @@
             scrollTime = scrollTime || 200;
             var z = {
                 el: _G.selector[0],
-                p: G.getPosition(_G.selector[0]),
-                s: G.getScroll(),
+                p: Go.getPosition(_G.selector[0]),
+                s: Go.getScroll(),
                 t: (new Date()).getTime(),
                 scroll: function(t, l) {
                     global.scrollTo(l, t)
@@ -1161,25 +1161,25 @@
         }
 	};
 
-    //G.PaddingString 填充字符串首尾 增加空格
+    //Go.PaddingString 填充字符串首尾 增加空格
     /**
      * @return {string}
      */
-    G.PaddingString = function(str) {
+    Go.PaddingString = function(str) {
         //Plus String cancat more fast than Array.prototype.join .
         //[" ",str," "].join("")
         return " " + str + " ";
     };
-    // G.PddingStack Padding Selector Size more than 3
-    G.PaddingStack = function(_G) {
-        G.GhostStack.push(_G);
+    // Go.PddingStack Padding Selector Size more than 3
+    Go.PaddingStack = function(_G) {
+        Go.GhostStack.push(_G);
     };
-    //G.Trim 去除字符串首尾的空格
-    G.Trim = function(str) {
+    //Go.Trim 去除字符串首尾的空格
+    Go.Trim = function(str) {
         return str.replace(/^\s+|\s+$/gm, "");
     };
     //V8 + ECMAScript 5  ObjectKeys
-    G.keys = function(obj) {
+    Go.keys = function(obj) {
         if (typeof obj !== 'object' && !obj) return [];
         if (nativeKeys) return nativeKeys(obj);
 
@@ -1188,141 +1188,140 @@
             if (obj.hasOwnProperty(key)) push.call(keys, key);
         return keys;
     };
-    //G.ListAry 还原一个真实的数组, 类似于function中arguments都不是真实的数组,包括IE8下的原生选择器的NodeList. 所以要包装一次
+    //Go.ListAry 还原一个真实的数组, 类似于function中arguments都不是真实的数组,包括IE8下的原生选择器的NodeList. 所以要包装一次
     // 比如 document.getElementsByClassName 这样的HTML5的方法 也不是返回一个真实纯净的数组
-    G.ListAry = function(ary) {
+    Go.ListAry = function(ary) {
         if (MSIE8) {
-            G.ListAry = function(Ary) {
+            Go.ListAry = function(Ary) {
                 //IE8 document.getElementByTagName is NodeList can't use slice.call
                 var result = [];
-                G.AryEach(Ary, function(e) { push.call(result, e) });
+                Go.AryEach(Ary, function(e) { push.call(result, e) });
                 return result;
             }
         } else {
-            G.ListAry = function(Ary) {
+            Go.ListAry = function(Ary) {
                 return slice.call(Ary);
             }
         }
-        return G.ListAry(ary);
+        return Go.ListAry(ary);
     };
-    //G.AryEach 正常迭代方式.可以多绑定一个上下文
-    G.AryEach = function(ary, callback, context) {
+    //Go.AryEach 正常迭代方式.可以多绑定一个上下文
+    Go.AryEach = function(ary, callback, context) {
         for (var i = 0, l = ary.length; i < l; i++)
             callback(ary[i], i, ary, context)
     };
     //InvEach 逆向迭代.当数组不计算迭代顺序的时候,逆向迭代效率明显高于顺序迭代
-    G.AryInvEach = function(ary, callback, context) {
+    Go.AryInvEach = function(ary, callback, context) {
         for (var i = ary.length; i--;)
             callback(ary[i], i, ary, context)
     };
-    //G.ObjEach 对象迭代. 可以绑定一个上下文
-    G.ObjEach = function(obj, callback, context) {
+    //Go.ObjEach 对象迭代. 可以绑定一个上下文
+    Go.ObjEach = function(obj, callback, context) {
         for (var k in obj)
             callback(obj[k], k, obj, context)
     };
-    //G.AryFilter 使用func方法来过滤数组中的数值.ECMAScript 5
-    G.AryFilter = function(ary, func) {
+    //Go.AryFilter 使用func方法来过滤数组中的数值.ECMAScript 5
+    Go.AryFilter = function(ary, func) {
         if (nativeFilter) {
             //ECMAScript 5 filter
             // func(e) 返回为 true. 则会被保留. 如果 func(e) 返回为false. 那就会被过滤从数组中移除掉
-            G.AryFilter = function(ary, func) {
+            Go.AryFilter = function(ary, func) {
                 return ary.filter(func)
             };
         } else {
-            G.AryFilter = function(ary, func) {
+            Go.AryFilter = function(ary, func) {
                 //ary [1,2,3,4,5]
                 //func function(e){ return e!==4 } -> [1,2,3,5]
-                for(var i = ary.length;i--;){
+                for(var i = ary.length;i--;)
                     if (!func(ary[i],i))  splice.call(ary,i,1);
-                }
                 return ary;
             };
         }
-        return G.AryFilter(ary, func)
+        return Go.AryFilter(ary, func)
     };
-	//G.AryReject 和filter的功能刚好相反
-	G.AryReject = function(ary,func){
+	//Go.AryReject 和filter的功能刚好相反
+	Go.AryReject = function(ary,func){
 		for(var i=ary.length;i--;)
 			if(func(ary[i],i)) splice.call(ary,i,1);
 		return ary;
 	};
-	//G.AryEvey && G.AryAll 判断数组中每一个数值是否复合条件, 如果有一个不符合, 都会返回false
-	G.AryEvey = G.AryAll = function(ary,func){
+	//Go.AryEvey && Go.AryAll 判断数组中每一个数值是否复合条件, 如果有一个不符合, 都会返回false
+	Go.AryEvey = Go.AryAll = function(ary,func){
 		for(var i=ary.length;i--;)
 			if(!func(ary[i])) return false;
 		return true;
 	};
-	G.ArySome = G.AryAny = function(ary,func){
-		func = func || G.identity;
+	Go.ArySome = Go.AryAny = function(ary,func){
+		func = func || Go.identity;
 		for(var i=ary.length;i--;)
 			if(func(ary[i])) return true;
 		return false;
 	};
-    //G.AryMap 数组映射.并且将数值压入另外一个数组,而不改变原来的数组
-    G.ListMap = function(ary, func) {
+    //Go.AryMap 数组映射.并且将数值压入另外一个数组,而不改变原来的数组
+    Go.ListMap = function(ary, func) {
         var map = [];
-        if (G.isArray(ary))
+        if (Go.isArray(ary))
             if (nativeMap)
                 return ary.map(func);
             else
-                G.AryEach(ary, function(e, index, ary) {
+                Go.AryEach(ary, function(e, index, ary) {
                     map.push(func(e, index, ary))
                 });
-        else if (G.isObject(ary))
-            G.ObjEach(ary, function(val, key, obj) {
+        else if (Go.isObject(ary))
+            Go.ObjEach(ary, function(val, key, obj) {
                 map.push(func(val, key, obj))
             });
         return map;
     };
-    // G.AryReduce 依据一个基数和函数 依照从左到右的顺序进行迭代.如果存在ECMAScript 5的方法,则refer可传可不传
+    // Go.AryReduce 依据一个基数和函数 依照从左到右的顺序进行迭代.如果存在ECMAScript 5的方法,则refer可传可不传
     // ECMAScript 5 JavaScript 1.8 中拥有reduce的方法, IE9以上的浏览器都实现了标准.reduce更加快
     // 可以传入对象, 对Object进行了扩展
-    // test -> G.AryReduce([1,2,3,4,5],function(a,b){ return a*b },1) -> (((1*2)*3)*4)*5) = 120
-    G.ListReduce = function(ary, func, refer) {
+    // test -> Go.AryReduce([1,2,3,4,5],function(a,b){ return a*b },1) -> (((1*2)*3)*4)*5) = 120
+    Go.ListReduce = function(ary, func, refer) {
         //refer必须传入,并且需要有类型,因为refer就是reduce所有动作的依据
-        if (G.isArray(ary)) {
+        if (Go.isArray(ary)) {
             //nativeReduce -> ary.reduce(func(firstValue,nextValue,index,thisAry))
             if (nativeReduce)
                 return ary.reduce(func);
             else
-                G.AryEach(ary, function(e) {
+                Go.AryEach(ary, function(e) {
                     refer = func(refer, e)
                 });
-        } else if (G.isObject(ary))
-            G.ObjEach(ary, function(e) {
+        } else if (Go.isObject(ary))
+            Go.ObjEach(ary, function(e) {
                 refer = func(refer, e)
             });
         return refer;
     };
-    // G.AryReduceRight 为上函数的逆向版本,则意思是从右到左.
-    G.ListReduceRight = function(ary, func, refer) {
-        if (G.isArray(ary))
+    // Go.AryReduceRight 为上函数的逆向版本,则意思是从右到左.
+    Go.ListReduceRight = function(ary, func, refer) {
+        if (Go.isArray(ary))
             //nativeReduceRight -> ary.reduceRight(func(lastValue,prevValue,index,thisAry))
             if (nativeReduceRight)
                 return ary.reduceRight(func);
             else
-                G.AryInvEach(ary, function(e) {
+                Go.AryInvEach(ary, function(e) {
                     refer = func(refer, e)
                 });
-        else if (G.isObject(ary)) {
-            var keys = G.keys(ary);
-            G.AryInvEach(keys, function(key) {
+        else if (Go.isObject(ary)) {
+            var keys = Go.keys(ary);
+            Go.AryInvEach(keys, function(key) {
                 refer = func(refer, ary[key])
             })
         }
         return refer;
     };
-    //G.AryFill ECMAScript 6 译为填充数组
+    //Go.AryFill ECMAScript 6 译为填充数组
     // [1,2,3,4,4].fill(4)        ->  [4,4,4,4,4]
     // [1,2,3,4,4].fill(4,1)      ->  [1,4,4,4,4]
     // [1,2,3,4,4].fill(4,1,8)    ->  [1,4,4,4,4,4,4,4]
     // [1,2,3,4,4].fill(5,3,4)    ->  [1,2,3,5,4]
     // [1,2,3,4,4].fill(5,2,3)    ->  [1,2,5,4,4]
     // [1,2,3,4,4].fill(5,-3,-1)  ->  [1,2,5,5,4]
-    G.AryFill = function(ary,value,start,end){
+    Go.AryFill = function(ary,value,start,end){
         //end unlimited , must greater than start.
         //can't extend for Object. it's bcs Object keys without( break ) order
-        if(G.isUndefined(value))
+        if(Go.isUndefined(value))
             return ary;
         if(nativeFill)
             return ary.fill(value,start,end);
@@ -1330,7 +1329,7 @@
             var len = ary.length;
             start = start < 0 ? len + start : start;
             end = end < 0 ? len + end : end;
-            if(G.isUndefined(start) && G.isUndefined(end)) {
+            if(Go.isUndefined(start) && Go.isUndefined(end)) {
                 //if no start end , just fill in ary
                 for(ary =[];len--;)
                     ary.push(value)
@@ -1348,24 +1347,24 @@
             return ary
         }
     };
-    //G.AryLoop 是模拟组无限循环
-    G.AryLoop = function(ary) {
+    //Go.AryLoop 是模拟组无限循环
+    Go.AryLoop = function(ary) {
         var last = ary.pop();
         unshift.call(ary, last);
         return ary;
     };
-    //G.AryDart 同样是模拟组无限循环
-    G.AryDart = function(ary) {
+    //Go.AryDart 同样是模拟组无限循环
+    Go.AryDart = function(ary) {
         var first = ary.shift();
         push.call(ary, first);
         return ary;
     };
-    //G.AryUnique 数组去除重复
-    G.AryUnique = function(ary) {
+    //Go.AryUnique 数组去除重复
+    Go.AryUnique = function(ary) {
         //支持数组内混杂数据的方式, 数字+字符串,均可以过滤
         var b = {};
         var result = [];
-        G.AryEach(ary,function(e){
+        Go.AryEach(ary,function(e){
             if(!b[e]) {
                 b[e] = true;
                 result.push(e);
@@ -1373,8 +1372,8 @@
         });
         return result;
     };
-    //G.AryDuplicate 纯数字快速去除重复
-    G.AryDuplicate = function(ary) {
+    //Go.AryDuplicate 纯数字快速去除重复
+    Go.AryDuplicate = function(ary) {
         //纯数值数组, 或者纯字符串数组. 不可混搭
         var i = ary.length - 1, j = i - 1;
 
@@ -1383,53 +1382,53 @@
         }
         return ary;
     };
-    //G.AryRmVal 去除数组中指定的值.支持多个单参数. 数值, 或者字符串
-    G.AryRmVal = function(ary) {
+    //Go.AryRmVal 去除数组中指定的值.支持多个单参数. 数值, 或者字符串
+    Go.AryRmVal = function(ary) {
         var args = slice.call(arguments, 1);
         var result = [];
         //args 正确
         if (!args.length)
             return ary;
         else if (args.length === 1) {
-            result = G.AryFilter(ary, function (e) { return e !== args[0] });
+            result = Go.AryFilter(ary, function (e) { return e !== args[0] });
             return result;
         }
         else {
             //building ths filter list function with -> new Function()
             var buildString = "return ";
-            G.AryEach(args, function(e) {
-                e = G.isString(e)?("'"+e+"'"):e;
+            Go.AryEach(args, function(e) {
+                e = Go.isString(e)?("'"+e+"'"):e;
                 buildString += "e!==" + e + "&&";
             });
             buildString = buildString.substr(0, buildString.length - 2);
             //has Building function
             var func = new Function("e", buildString);
 
-            return G.AryFilter(ary, func);
+            return Go.AryFilter(ary, func);
         }
     };
-    //G.AryRmValList 去除掉数组中指定值, 第二个参数固定传入一个数组
-    G.AryRmValList = function(ary,reList){
+    //Go.AryRmValList 去除掉数组中指定值, 第二个参数固定传入一个数组
+    Go.AryRmValList = function(ary,reList){
         var buildString= "return ";
-        G.AryEach(reList,function(item){
-            item = G.isString(item)?("'"+item+"'"):item;
+        Go.AryEach(reList,function(item){
+            item = Go.isString(item)?("'"+item+"'"):item;
             buildString += "e!==" + item + "&&";
         });
         buildString = buildString.substr(0,buildString.length - 2);
 
         var func = new Function("e",buildString);
 
-        return G.AryFilter(ary,func);
+        return Go.AryFilter(ary,func);
     };
-    //G.AryFind 找到数组或者对象中,第一个复合判断函数条件的值,或者键值对,然后返回.
-    //G.AryFind(obj(or ary), function(value,key(or index),thisObj(or thisAry){ return --Some logic. must be type of Boolean-- })
+    //Go.AryFind 找到数组或者对象中,第一个复合判断函数条件的值,或者键值对,然后返回.
+    //Go.AryFind(obj(or ary), function(value,key(or index),thisObj(or thisAry){ return --Some logic. must be type of Boolean-- })
     //ECMAScript 6 Array.prototype.find
-    G.AryFind = function(ary,func){
-        if(G.isArray(ary)) {
+    Go.AryFind = function(ary,func){
+        if(Go.isArray(ary)) {
             for (var i = 0, l = ary.length; i < l; i++)
                 if (func(ary[i], i, ary)) return ary[i];
         }
-        else if(G.isObject(ary)) {
+        else if(Go.isObject(ary)) {
             for (var key in ary)
                 if (func(ary[key], key, ary)) {
                     var obj = {};
@@ -1438,75 +1437,75 @@
                 }
         }
     };
-	//G.AryFindIndex ECMAScript 6
-	G.AryFindIndex = function(ary,func){
-        if(G.isArray(ary))
+	//Go.AryFindIndex ECMAScript 6
+	Go.AryFindIndex = function(ary,func){
+        if(Go.isArray(ary))
             for (var i = 0, l = ary.length; i < l; i++)
                 if (func(ary[i], i, ary)) return i;
-        else if(G.isObject(ary))
+        else if(Go.isObject(ary))
             for (var key in ary)
                 if (func(ary[key], key, ary)) return key;
 	};
-	//G.ListContains if find the value, then return Boolean true
-	G.ListContains = function(list,value){
-		if(G.isArray(list))
+	//Go.ListContains if find the value, then return Boolean true
+	Go.ListContains = function(list,value){
+		if(Go.isArray(list))
 			for(var i=list.length;i--;)
 				if(list[i] === value) return true	
-		else if(G.isObject(list))
+		else if(Go.isObject(list))
 			for(var key in list)
 				if(list[key] === value) return true
 
 		return false
 	};
 	
-	//G.ListHook make function hook to every list item
-	G.ListHook = function(list,hook){
+	//Go.ListHook make function hook to every list item
+	Go.ListHook = function(list,hook){
 		var args = slice.call(arguments,2),
-			isfunc = G.isFunction(hook);
-		return G.ListMap(list,function(value){
+			isfunc = Go.isFunction(hook);
+		return Go.ListMap(list,function(value){
 			return (isfunc ? hook : value[hook]).apply(value,args);
 		})
 	};
 
-	//G.ListPluck extraction the obj[keys],value,than return the value Array []
+	//Go.ListPluck extraction the obj[keys],value,than return the value Array []
 	//
-	//G.ListPluck([ {name:1,two:2}, {name:2,two:3}, {name:3,two:4}, {name:4,two:5}],'name')
+	//Go.ListPluck([ {name:1,two:2}, {name:2,two:3}, {name:3,two:4}, {name:4,two:5}],'name')
 	// -> [1, 2, 3, 4]
-	//G.ListPluck([ {name:1,two:2}, {name:2,two:3}, {name:3,two:4}, {name:4,two:5}],'two')
+	//Go.ListPluck([ {name:1,two:2}, {name:2,two:3}, {name:3,two:4}, {name:4,two:5}],'two')
 	// -> [2, 3, 4, 5]
-	//G.ListPluck({ key1:{name:1,two:2}, key2:{name:2,two:3}, key3:{name:3,two:4}, key4:{name:4,two:5}},'name')
+	//Go.ListPluck({ key1:{name:1,two:2}, key2:{name:2,two:3}, key3:{name:3,two:4}, key4:{name:4,two:5}},'name')
 	// -> [1, 2, 3, 4]
-	//G.ListPluck({ key1:{name:1,two:2}, key2:{name:2,two:3}, key3:{name:3,two:4}, key4:{name:4,two:5}},'two')
+	//Go.ListPluck({ key1:{name:1,two:2}, key2:{name:2,two:3}, key3:{name:3,two:4}, key4:{name:4,two:5}},'two')
 	// -> [2, 3, 4, 5]
-	G.ListPluck = function(list,mapkey){
+	Go.ListPluck = function(list,mapkey){
 		var result = [];
-		if(G.isArray(list))
-			G.AryEach(list,function(item){
-				G.ObjEach(item,function(val,key){ if(key==mapkey) result.push(val) })			
+		if(Go.isArray(list))
+			Go.AryEach(list,function(item){
+				Go.ObjEach(item,function(val,key){ if(key==mapkey) result.push(val) })			
 			});
-		else if(G.isObject(list))
-			G.ObjEach(list,function(obj){
-				G.ObjEach(obj,function(val,key){ if(key==mapkey) result.push(val) })
+		else if(Go.isObject(list))
+			Go.ObjEach(list,function(obj){
+				Go.ObjEach(obj,function(val,key){ if(key==mapkey) result.push(val) })
 			});
 		return result
 	};
 
-	//G.AryGroup part of Array by your Method , return final Object { }
+	//Go.AryGroup part of Array by your Method , return final Object { }
 	//
-	//G.AryGroup( ["one","two","three","four","five","six"] , "length" )
+	//Go.AryGroup( ["one","two","three","four","five","six"] , "length" )
 	// -> { "3":["one","two","six"], "4":["four","five"], "5":["three"] }
 	//
-	//G.AryGroup([1.3, 1.6, 2.1, 2.4, 2.4, 2.6, 3.0, 3.8, 4.2], function(num){ return Math.floor(num); })
+	//Go.AryGroup([1.3, 1.6, 2.1, 2.4, 2.4, 2.6, 3.0, 3.8, 4.2], function(num){ return Math.floor(num); })
 	// -> {  1 :[1.3, 1.6],  2 :[2.1, 2.4, 2.4, 2.6],  3: [3.0,3.8],  4 : [4.2]  }
 	//
-	//G.AryGroup(["Given","JayXon",1,33,"G","1",4,"Ghost"],function(val){ 
-	//		return G.isNumber(val) ? "number" : "string"; 
+	//Go.AryGroup(["Given","JayXon",1,33,"G","1",4,"Ghost"],function(val){ 
+	//		return Go.isNumber(val) ? "number" : "string"; 
 	//});
 	// -> { "number": [1,33,4] , "string": ["Given","JayXon","G","1","Ghost"] }
-	G.AryGroup = function(ary,by){
+	Go.AryGroup = function(ary,by){
 		var groupObj = {},
-			isByFunc = G.isFunction(by);
-		G.AryEach(ary,function(val,index,ary){
+			isByFunc = Go.isFunction(by);
+		Go.AryEach(ary,function(val,index,ary){
 			var key = isByFunc ? by(val) : val[by];
 			if(!groupObj[key])
 				//init object key
@@ -1518,15 +1517,15 @@
 		return groupObj;
 	};
 
-	//G.AryGroupByKey Base on G.AryGroup .
+	//Go.AryGroupByKey Base on Go.AryGroup .
 	//But it Just Useful [{},{},{},{},{}] data struct
-	G.AryGroupByKey = function(ary,keyName){
-		return G.AryGroup(ary,keyName.toString());
+	Go.AryGroupByKey = function(ary,keyName){
+		return Go.AryGroup(ary,keyName.toString());
 	};
 	
 	//Made Object's value to aryList .
-	G.ObjtoAry = function(obj){
-		var keys = G.keys(obj),
+	Go.ObjtoAry = function(obj){
+		var keys = Go.keys(obj),
 			len  = keys.length,
 			ary  = Array(len);
 		for(var i=len;i--;)
@@ -1536,12 +1535,12 @@
 	// AryList DisOrder
 	// Shuffle a collection, using the modern version of the
  	// [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
-	G.AryDisorder = function(obj){
-		var setting = obj && obj.length === +obj.length ? obj : G.ObjtoAry(obj),
+	Go.AryDisorder = function(obj){
+		var setting = obj && obj.length === +obj.length ? obj : Go.ObjtoAry(obj),
 			length  = setting.length,
 			disorder= Array(length);
 		for(var index =0,rand; index<length; index++){
-			rand = G.Random(0,index);
+			rand = Go.Random(0,index);
 			if(rand !== index)
 				disorder[index] = disorder[rand];
 			disorder[rand] = setting[index];
@@ -1549,13 +1548,13 @@
 		return disorder;
 	};
 
-	//G.Aryof ECMAScript 6
-	G.AryOf = function(){
+	//Go.Aryof ECMAScript 6
+	Go.AryOf = function(){
 		if(!arguments.length) return [];
 		return slice.call(arguments);
 	};
 
-	G.Random = function(min,max){
+	Go.Random = function(min,max){
 		if(max == null){
 			max = min;
 			min = 0;
@@ -1563,8 +1562,8 @@
 		return min + Math.floor(Math.random()*(max-min+1));			
 	}
 	
-    //G.PackAge 合并对象. 通常用于扩展时合并options 非常重要!
-    G.Package = function(oobj, fobj) {
+    //Go.PackAge 合并对象. 通常用于扩展时合并options 非常重要!
+    Go.Package = function(oobj, fobj) {
         //fobj 优先覆盖 oobj
         //最终使用 oobj 来作为控制访问对象,或者option对象.不要使用fobj.
         //千万不要使用fobj来作为option对象.它只不过是个临时的合并对象
@@ -1572,20 +1571,20 @@
             oobj[key] = fobj[key]
         return oobj;
     };
-    //G.ElemntChild 一个节点中的全部子节点, 不包括文本节点 和 script 节点
-    G.ElementChild = function(elm) {
+    //Go.ElemntChild 一个节点中的全部子节点, 不包括文本节点 和 script 节点
+    Go.ElementChild = function(elm) {
         var result = [];
-        G.AryEach(elm.childNodes, function(e) {
+        Go.AryEach(elm.childNodes, function(e) {
             //必须是个Element节点 防止得到 SCRIPT 标签
             if (e.nodeType === 1 && e.nodeName !== "SCRIPT")
                 push.call(result, e);
         });
         return result;
     };
-    //G.TextChild 一个节点中的全部子文本节点. 不包括元素节点 和 script 节点
-    G.TextChild = function(elm) {
+    //Go.TextChild 一个节点中的全部子文本节点. 不包括元素节点 和 script 节点
+    Go.TextChild = function(elm) {
         var result = [];
-        G.AryEach(elm.childNodes, function(e) {
+        Go.AryEach(elm.childNodes, function(e) {
             //必须是个Text文本节点
             //值得注意的是, Text文本节点是一个object类型,可以访问它的属性,而不是纯字符串
             //其中 Text文本节点属性 nodeValue 是一个可以读写的属性, 记录了内部的文本字符串. 可以通过修改 nodeValue 来达到修改文本的目的
@@ -1595,7 +1594,7 @@
         return result;
     };
     //Hex颜色值 转化成RGB 类型,返回RGB对象
-    G.HEXtoRGB = function(hex){
+    Go.HEXtoRGB = function(hex){
         hex = parseInt((hex.charAt(0) === '#' ? hex.substring(1) : hex),16);
 
         return {
@@ -1609,13 +1608,13 @@
     /**
      * @return {string}
      */
-    G.RGBtoHEX = function(rgb){
+    Go.RGBtoHEX = function(rgb){
         var hex = [
             rgb.r.toString(16),
             rgb.g.toString(16),
             rgb.b.toString(16)
         ];
-        hex = G.AryMap(hex,function(val){
+        hex = Go.AryMap(hex,function(val){
             if(val.length === 1)
                 return "0"+val;
             return val;
@@ -1623,8 +1622,8 @@
         hex.unshift('#');
         return hex.join('');
     };
-    //G.createElement 创建一个Element元素, 并且添加属性
-    G.createElement = function(elmname, profileOBJ) {
+    //Go.createElement 创建一个Element元素, 并且添加属性
+    Go.createElement = function(elmname, profileOBJ) {
         var elm = doc.createElement(elmname);
         if (profileOBJ && profileOBJ instanceof Object && profileOBJ !== broken) {
             for (var k in profileOBJ) {
@@ -1633,44 +1632,44 @@
         }
         return elm;
     };
-    //G.createText 创建一个Text文本节点
-    G.createText = function(text) {
+    //Go.createText 创建一个Text文本节点
+    Go.createText = function(text) {
         return doc.createTextNode(text);
     };
 
-    //G.NoSQL WriteStack
-    G.WriteEventGNoSQLStack = function(elm, stackName, event, func) {
+    //Go.NoSQL WriteStack
+    Go.WriteEventGNoSQLStack = function(elm, stackName, event, func) {
         //注入NoSQL的几个必要的条件是
-        //1. elm必须有G_nosql的属性 (说明该标签事件已经被注入到G.NoSQL缓存中);
-        //2. elm的这个event事件.是否已经存在于G.NoSQL.NoSQLStack.event中, 只有存在了这个事件, 才能对它进行添加
+        //1. elm必须有G_nosql的属性 (说明该标签事件已经被注入到Go.NoSQL缓存中);
+        //2. elm的这个event事件.是否已经存在于Go.NoSQL.NoSQLStack.event中, 只有存在了这个事件, 才能对它进行添加
         var NoSQLEventName = "_G_Event_" + event;
         var inStack = elm.getAttribute("G_nosql");
-        if (inStack && G.NoSQL[inStack]) {
+        if (inStack && Go.NoSQL[inStack]) {
 
-            if (G.NoSQL[inStack].hasOwnProperty(NoSQLEventName)) {
-                var inStackTarget = G.NoSQL[inStack][NoSQLEventName];
+            if (Go.NoSQL[inStack].hasOwnProperty(NoSQLEventName)) {
+                var inStackTarget = Go.NoSQL[inStack][NoSQLEventName];
                 push.call(inStackTarget, func);
             } else {
-                var process = G.NoSQL[inStack][NoSQLEventName] = [];
+                var process = Go.NoSQL[inStack][NoSQLEventName] = [];
                 push.call(process, func);
             }
             //如果这个DOM元素已经在Stack中构建的缓存.则我们需要在指定的Stack位置添加绑定事件的函数即可
 
         } else {
             //如果没有给DOM元素绑定事件时候构建缓存, 那么就新建一个缓存
-            var getStackNow = stackName + G.NoSQLStack.toString(),
-                buildEventStack = G.NoSQL[getStackNow] = {};
+            var getStackNow = stackName + Go.NoSQLStack.toString(),
+                buildEventStack = Go.NoSQL[getStackNow] = {};
             buildEventStack.type = "GhostJS_DOM_Event";
             buildEventStack._G_DOM = elm;
             buildEventStack[NoSQLEventName] = [];
             push.call(buildEventStack[NoSQLEventName], func);
 
             elm.setAttribute("G_nosql", getStackNow);
-            G.NoSQLStack++;
+            Go.NoSQLStack++;
         }
     };
 
-    G.getPosition = function(e) {
+    Go.getPosition = function(e) {
         var x = 0,
             y = 0;
         var w = intval(e.style.width);
@@ -1692,7 +1691,7 @@
             hb: hb  //e元素模型盒子的真实高度
         };
     };
-    G.getScroll = function() {
+    Go.getScroll = function() {
         var t, l, w, h;
         if (document.documentElement && document.documentElement.scrollTop) {
             t = document.documentElement.scrollTop;
@@ -1712,17 +1711,17 @@
             h: h
         };
     };
-    G.insetScript = function(scriptUrlary) {
+    Go.insetScript = function(scriptUrlary) {
         var body = document.getElementsByTagName("body")[0];
-        G.AryEach(scriptUrlary, function(url) {
-            var scriptTag = G.createElement("script", {
+        Go.AryEach(scriptUrlary, function(url) {
+            var scriptTag = Go.createElement("script", {
                 type: "text/javascript",
                 src: url
             });
             body.appendChild(scriptTag);
         })
     };
-    G.bscTop = function() {
+    Go.bscTop = function() {
         return global.pageYOffset || doc.documentElement.scrollTop || doc.body.scrollTop || 0;
     };
 
@@ -1747,26 +1746,26 @@
             '&#x60;': '`'
         };
 
-    G.replaceHTMLencode = function(tag) {
+    Go.replaceHTMLencode = function(tag) {
         return HTMLencodingReplaceObject[tag] || tag;
     };
-    G.replaceHTMLdecode = function(code) {
+    Go.replaceHTMLdecode = function(code) {
         return HTMLdecodingReplaceObject[code] || code;
     };
 
-    G.HTMLencode = function(htmlString) {
-        return htmlString.replace(/[&<">'](?:(amp|lt|quot|gt|#39);)?/g, G.replaceHTMLencode);
+    Go.HTMLencode = function(htmlString) {
+        return htmlString.replace(/[&<">'](?:(amp|lt|quot|gt|#39);)?/g, Go.replaceHTMLencode);
     };
 	//"
-    G.HTMLdecode = function(htmlencodeString) {
-        return htmlencodeString.replace(/&((g|l|quo)t|amp|#39);/g, G.replaceHTMLdecode);
+    Go.HTMLdecode = function(htmlencodeString) {
+        return htmlencodeString.replace(/&((g|l|quo)t|amp|#39);/g, Go.replaceHTMLdecode);
     };
 
     // @ Ghost JavaScript TempLate Engine
-    // @ call G.template() building the js template
+    // @ call Go.template() building the js template
     // @ Base on Underscore.js Template Engine  By Jeremy Ashkenas
     // @ First Building Template
-    //			var tpl = G.template(
+    //			var tpl = Go.template(
     //				'<ul>'+
     //					'<li>{{=name}}</li>'+
     //					'<li>{{=time}}</li>'+
@@ -1779,8 +1778,8 @@
     //			G("DOM").insetHTML(tpl(data));
     //
     // @ even you can change the template rule Coding
-    // @ that you would rewrite [ G.templateOption ] object [ evalute , interpolate , escape ] like that :
-    //		G.templateOption = {
+    // @ that you would rewrite [ Go.templateOption ] object [ evalute , interpolate , escape ] like that :
+    //		Go.templateOption = {
     //			evaluate: /<\*([\s\S]+?)\*>/g,
     //			interpolate: /<\*=([\s\S]+?)\*>/g,
     //			escape: /<\*-([\s\S]+?)\*>/g
@@ -1797,9 +1796,9 @@
     // @ interpolate : JavaScript variable
     // @ escape : reject JavaScript inset XSS attack JavaScript Code
 
-    G.escape = createEscaper(HTMLencodingReplaceObject);
+    Go.escape = createEscaper(HTMLencodingReplaceObject);
     //Building The Template Default Options
-    G.templateOption = {
+    Go.templateOption = {
         evaluate: /{{([\s\S]+?)}}/g,
         interpolate: /{{=([\s\S]+?)}}/g,
         escape: /{{#([\s\S]+?)}}/g
@@ -1819,9 +1818,9 @@
         escapeChar = function(match) {
             return '\\' + escapes[match];
         };
-    G.template = function(text, option) {
+    Go.template = function(text, option) {
         //composs options
-        option = G.Package(G.templateOption, option);
+        option = Go.Package(Go.templateOption, option);
 
         var index = 0;
         var source = "_p+='";
@@ -1837,7 +1836,7 @@
             index = offset + match.length;
 
             if (escape) {
-                source += "'+\n((_t=(" + escape + "))==null?'':G.escape(_t))+\n'";
+                source += "'+\n((_t=(" + escape + "))==null?'':Go.escape(_t))+\n'";
             } else if (interpolate) {
                 source += "'+\n((_t=(" + interpolate + "))==null?'':_t)+\n'";
             } else if (evaluate) {
@@ -1856,7 +1855,7 @@
         //Complete Building JavaScript expression
         //try to building the Function. That you can use the G _ Ghost Method to Parse Data
         try {
-            var render = new Function(option.variable||'obj','G',source);
+            var render = new Function(option.variable||'obj','Go',source);
         } catch (e) {
             e.source = source;
             throw e;
@@ -1865,7 +1864,7 @@
         //Precompile JavaScript Template Function
         //the you build once template that use diff Data, not use diff to build function again
         var template = function(data) {
-            return render.call(this, data, G);
+            return render.call(this, data, Go);
         };
 
 
@@ -1873,42 +1872,42 @@
     };
     //end For Ghost Template
     //Boolean of variable type. that make GhostJS Standard
-    G.has = function(obj, key) {
+    Go.has = function(obj, key) {
         return obj != null && hasOwnProperty.call(obj, key);
     };
-    G.isObject = function(v) {
+    Go.isObject = function(v) {
         var type = typeof v;
         return type === 'function' || type === 'object' && !!v;
     };
-    G.isArray = nativeIsArray || function(v) {
+    Go.isArray = nativeIsArray || function(v) {
         return nativeToString.call(v) === '[object Array]';
     };
-    G.AryEach(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
-        G['is' + name] = function(obj) {
+    Go.AryEach(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
+        Go['is' + name] = function(obj) {
             return nativeToString.call(obj) === '[object ' + name + ']';
         };
     });
 
     // Define a fallback version of the method in browsers (ahem, IE), where
     // there isn't any inspectable "Arguments" type.
-    if (!G.isArguments(arguments)) {
-        G.isArguments = function(obj) {
-            return G.has(obj, 'callee');
+    if (!Go.isArguments(arguments)) {
+        Go.isArguments = function(obj) {
+            return Go.has(obj, 'callee');
         };
     }
 
     // Optimize `isFunction` if appropriate. Work around an IE 11 bug.
     if (typeof /./ !== 'function') {
-        G.isFunction = function(obj) {
+        Go.isFunction = function(obj) {
             return typeof obj == 'function' || false;
         };
     }
 
-	G.isUndefined = function(obj){
+	Go.isUndefined = function(obj){
 		return obj === void 0;
 	};
 
-	G.identity = function(val){
+	Go.identity = function(val){
 		return val;
 	};
 
@@ -1919,7 +1918,7 @@
     //        @ Cookie
     //        @ JSONP
 
-    G.AJAX = function(profile) {
+    Go.AJAX = function(profile) {
         //  profile
         //  async  .. true 默认是异步
         //  url ..""  ..url 地址参数.必须
@@ -1929,13 +1928,13 @@
         //  setHeader ..设置头部.接受一个obj
         //  data .. send 内部设置参数 如果方法为get. data参数即使被写入, 也是无效的. 而如果方法参数是post.则data会通过send的参数发送出去.
         function request(obj) {
-            var option = G.Package({
+            var option = Go.Package({
                 url: "",
                 async: true,
                 method: "GET",
                 data: null,
-                success: G._NOOP,
-                error: G._NOOP,
+                success: Go._NOOP,
+                error: Go._NOOP,
                 setHeader: broken
             }, obj);
 
@@ -1966,7 +1965,7 @@
             request: request(profile)
         }
     };
-    G.JSONP = function(obj) {
+    Go.JSONP = function(obj) {
         //  obj的参数
         //  url : ..url路径;
         //  jsonp : ..callBack键, 一般来说, 默认是字符串 "callback"
@@ -1981,13 +1980,13 @@
             throw new Error("JSONP param is no available");
         }
         //设置默认参数
-        var options = G.Package({
+        var options = Go.Package({
             url: "",
             jsonp: "callback",
             jsonpCallback: ('jsonp' + Math.random()).replace(".", ""),
             timeout: 1000 * 10,
-            fail: G._NOOP,
-            success: G._NOOP,
+            fail: Go._NOOP,
+            success: Go._NOOP,
             data: broken
         }, obj);
         //data表示跨域请求额外附加的参数,如果这个参数存在, 就会想下面一样的形式存在在url中,一起发送
@@ -2034,13 +2033,13 @@
         }
     };
 
-    G.Cookie = function(useroptions) {
+    Go.Cookie = function(useroptions) {
         //cookies封装
-        //G.Cookie接受一个参数.可以是字符串, 也可以是对象
+        //Go.Cookie接受一个参数.可以是字符串, 也可以是对象
         //
         /*
          对象设置
-         G.Cookie({
+         Go.Cookie({
          name:"cookiename"
          value:"cookievalue",
          expires:"过期时间",              //默认是当前事件延长一年 new Date() setDate + 365 这里需要传入一个标准的GMT时间. var t = new Date(); t.setDate(t.getDate + 天数) . t = t.toGMTString()
@@ -2050,15 +2049,15 @@
          });
 
          字符串设置
-         G.Cookie("name=value;expires=;path=;domain=;secure")
+         Go.Cookie("name=value;expires=;path=;domain=;secure")
 
          也可以只传入短参数字符串
-         G.Cookie("name=value")
+         Go.Cookie("name=value")
          */
         if (typeof useroptions === 'object' && useroptions !== broken) {
             var time = new Date();
             time.setDate(time.getDate() + 365);
-            var options = G.Package({
+            var options = Go.Package({
                 "name": "GhostJS",
                 "value": "initGhostCookie",
                 "expires": time.toGMTString(),
@@ -2072,7 +2071,7 @@
                 "expires=" + options.expires + ";" +
                 "path=" + options.path + ";" +
                 "domain=" + options.domain + ";";
-            doc.cookie = G.Trim(PackAgeCookie + (!options.secure ? "" : "secure"));
+            doc.cookie = Go.Trim(PackAgeCookie + (!options.secure ? "" : "secure"));
         } else if (useroptions === useroptions + "") {
             if (useroptions.indexOf("=") > 0) {
                 //如果字符串包含等于 = , 则表示需要设置cookies
@@ -2095,7 +2094,7 @@
         }
     };
 
-    G.Animate = function(e, profile, tween, unit, callBack, d, t) {
+    Go.Animate = function(e, profile, tween, unit, callBack, d, t) {
         //首先你要清楚, 一个动画.什么在变, 什么是不变
         //而一个模块里.真正在变化的. 只有一个参数.也就是以t为标准的步长参数在不断的变化.
         //而最后无限接近到目标值.d. 由t-d的步长距离,比如步长是1,那么我d就是终点. 可以设置为100,相当于我要走一百步才能到达终点
@@ -2117,7 +2116,7 @@
         unit = unit || "";
         t = t || 2;
         d = d || 300;
-        callBack = callBack || G._NOOP;
+        callBack = callBack || Go._NOOP;
         for (var i in profile) {
             (function(i) {
                 var b = parseInt(e.currentStyle ? e.currentStyle[i] : getComputedStyle(e)[i]),
@@ -2167,7 +2166,7 @@
                  }
                  elm["_G_"+ed].push(cd);*/
                 //将事件注入原生DOM节点作为标志
-                G.WriteEventGNoSQLStack(elm, "G_Event", ed, cd);
+                Go.WriteEventGNoSQLStack(elm, "G_Event", ed, cd);
             };
             return BindALL(e, event, callback);
         } else if (MSIE8 && doc.attachEvent) {
@@ -2179,7 +2178,7 @@
                     elm["e" + ed + cd](global.event)
                 };
                 elm.attachEvent("on" + ed, elm[ed + cd]);
-                G.WriteEventGNoSQLStack(elm, "G_Event", ed, cd);
+                Go.WriteEventGNoSQLStack(elm, "G_Event", ed, cd);
             };
             return BindALL(e, event, callback);
         } else {
@@ -2189,12 +2188,12 @@
 
     function UnBindALL(e, event, callback) {
         /*对于unbind来说.一个元素的解除绑定, 可以是指向解除某个函数 某个事件.所以要根据参数来执行步骤.unbind就会显得非常的复杂*/
-        /*DOM元素解绑的时候同样需要将已经注入到G.NoSQL中的绑定缓存给清理掉*/
+        /*DOM元素解绑的时候同样需要将已经注入到Go.NoSQL中的绑定缓存给清理掉*/
         var inStack = e.getAttribute("G_nosql");
         if (arguments.length == 1 && !event) {
             //如果没有指定event事件, 也没有指定解绑的函数,就会将当前DOM元素所有的事件全部解绑.
-            //存储记录在G.NoSQL 事件的指引位置.
-            var p = G.NoSQL[inStack];
+            //存储记录在Go.NoSQL 事件的指引位置.
+            var p = Go.NoSQL[inStack];
             if (doc.removeEventListener) {
                 for (var events in p) {
                     if (/_G_Event_(\w+)/i.test(events)) {
@@ -2218,11 +2217,11 @@
                     }
                 }
             }
-            G(e).rmAttr("G_nosql");
-            delete G.NoSQL[inStack];
+            Go(e).rmAttr("G_nosql");
+            delete Go.NoSQL[inStack];
         } else if (event && !callback) {
             var GEvent = "_G_Event_" + event;
-            var pE = G.NoSQL[inStack][GEvent];
+            var pE = Go.NoSQL[inStack][GEvent];
             if (!pE) {
                 return;
             }
@@ -2236,10 +2235,10 @@
                     e[event + pE[i]] = null;
                 }
             }
-            delete G.NoSQL[inStack][GEvent];
+            delete Go.NoSQL[inStack][GEvent];
         } else {
             var G_Event = "_G_Event_" + event;
-            var pIn = G.NoSQL[inStack][G_Event];
+            var pIn = Go.NoSQL[inStack][G_Event];
             if (doc.removeEventListener) {
                 e.removeEventListener(event, callback, false);
             } else {
@@ -2255,7 +2254,7 @@
     }
 
     function hasClass(elm, className) {
-        return new RegExp(G.PaddingString(className)).test(G.PaddingString(elm.className));
+        return new RegExp(Go.PaddingString(className)).test(Go.PaddingString(elm.className));
     }
 
     function getClass(elm, tag) {
@@ -2264,7 +2263,7 @@
             //HTML5的方法
             getClass = function(elm) {
                 var elms = doc.getElementsByClassName(elm);
-                return G.ListAry(elms);
+                return Go.ListAry(elms);
             };
             return getClass(elm);
         } else if (MSIE8 && qSA) {
@@ -2272,7 +2271,7 @@
             getClass = function(elm) {
                 var result = [];
                 var elms = qSA("." + elm);
-                G.AryEach(elms, function(e) {
+                Go.AryEach(elms, function(e) {
                     push.call(result, e);
                 });
                 return result;
@@ -2304,13 +2303,13 @@
             createXHR = function() {
                 if (typeof arguments.callee.activeXString != "string") {
                     var version = ['MSXML2.XMLHttp.6.0', 'MSXML2.XMLHttp.3.0', 'MSXML2.XMLHttp', 'Microsoft.XMLHTTP'];
-                    G.AryEach(version, function(ver) {
+                    Go.AryEach(version, function(ver) {
                         try {
                             var xhr = new ActiveXObject(ver);
                             arguments.callee.activeXString = ver;
                             return xhr;
                         } catch (ex) {
-                            G._NOOP()
+                            Go._NOOP()
                         }
                     });
                 }
@@ -2333,7 +2332,7 @@
                 error(xhr);
             }
         } else {
-            G._NOOP();
+            Go._NOOP();
         }
     }
 
@@ -2399,7 +2398,7 @@
             return map[match];
         };
 
-        var source = '(?:' + G.keys(map).join('|') + ')';
+        var source = '(?:' + Go.keys(map).join('|') + ')';
         var testRegexp = RegExp(source);
         var replaceRegexp = RegExp(source, 'g');
         return function(string) {
@@ -2409,7 +2408,7 @@
     }
 
     //ActionScript 3.0 Tween 动画算法
-    G.Tween = {
+    Go.Tween = {
         Linear: function(t, b, c, d) {
             return c * t / d + b;
         },
@@ -2548,7 +2547,7 @@
         },
         Bounce: {
             easeIn: function(t, b, c, d) {
-                return c - G.Tween.Bounce.easeOut(d - t, 0, c, d) + b;
+                return c - Go.Tween.Bounce.easeOut(d - t, 0, c, d) + b;
             },
             easeOut: function(t, b, c, d) {
                 if ((t /= d) < (1 / 2.75)) {
@@ -2562,12 +2561,12 @@
                 }
             },
             easeInOut: function(t, b, c, d) {
-                if (t < d / 2) return G.Tween.Bounce.easeIn(t * 2, 0, c, d) * .5 + b;
-                else return G.Tween.Bounce.easeOut(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
+                if (t < d / 2) return Go.Tween.Bounce.easeIn(t * 2, 0, c, d) * .5 + b;
+                else return Go.Tween.Bounce.easeOut(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
             }
         }
     };
 
-    global.G = global.Ghost = G;
-    return G;
+    global.Go = global.Ghost = Go;
+    return Go;
 }));
