@@ -17,11 +17,12 @@
 			var tplBuilding =
 		   		''	
 				+'<ol>'
-				+'{{  data.list = data.list.split(","); }}'
-				+'{{  data.list = Go.AryFilter(data.list,function(e){ return (/C\\+\\+/gi).test(e) });  }}'				
-				+'{{  console.log(data.list) }}'
-				+'{{  Go.AryEach(data.list,function(item){  }}' 
-				+	'<li>{{= item }}</li>'	
+				+'{{  data = data["list"]; }}'
+				+'{{  DataList = JSON.parse(decodeURIComponent(data)); }}'
+				+'{{  console.log(DataList); }}'
+				+'{{  Go.ObjEach(DataList,function(item){  }}' 
+				+	'<li>{{= item.lag }}</li>'
+				+	'<li>{{= item.autor }}</li>' 	
 				+'{{  }) }}'
 				+'</ol>'
 				+'{{ Go("#btn").unbind() }}'
@@ -30,8 +31,8 @@
 
 			Go("#btn").bind("click",function(){
 				Go.JSONP({
-					url		:	"http://jsfiddle.net/echo/jsonp",
-					data	:	{ list: "JavaScript,C,C++,JAVA,Dart,Lisp,PHP" },
+					url		:	"http://jsfiddle.Net/echo/jsonp",
+					data	:	{ 'list': '{ "1":{"lag":"JavaScript","autor":"Ghost" }, "2":{"lag":"C++","autor":"Demon"} }' },
 					fail 	:   function(e){ alert(e); },
 					success	:	function(data){ Go("#list .divblock").insetHTML(tpl(data)) } 
 				});
