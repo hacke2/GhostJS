@@ -13,8 +13,27 @@
  *              Just join myself. Get Busy life or Get Busy Die...
  *
  *              ...缘分写在三生石上面...
- *              <-- 江南 -->
  *              < http://y.qq.com/#type=song&mid=001oGzem0k192p >
+ *
+ *                  .                   
+    ##############.....   #############  
+    ##############....... #############   
+      ##########..........###########     
+      ##########........###########       
+      ##########.......##########        
+      ##########.....##########..        
+     .##########....##########.....      
+   ...##########..##########.........    
+ .....##########.#########.............  
+   ...################GGG............    
+    . ################.............      
+      ##############.GGG...GGGGGGGGGG      
+      ############...GG...GG..GG  GG     
+      ##########....GG...GG..GG  GG      
+      ########.....GGG..GGG GGG GGG     
+      ######    .........                
+                  .....                  
+                    .       
  *
  */
 
@@ -1417,7 +1436,6 @@
         buildString = buildString.substr(0,buildString.length - 2);
 
         var func = new Function("e",buildString);
-
         return Go.AryFilter(ary,func);
     };
     //Go.AryFind 找到数组或者对象中,第一个复合判断函数条件的值,或者键值对,然后返回.
@@ -1454,7 +1472,6 @@
 		else if(Go.isObject(list))
 			for(var key in list)
 				if(list[key] === value) return true
-
 		return false
 	};
 	
@@ -1560,7 +1577,7 @@
 			min = 0;
 		}
 		return min + Math.floor(Math.random()*(max-min+1));			
-	}
+	};
 	
     //Go.PackAge 合并对象. 通常用于扩展时合并options 非常重要!
     Go.Package = function(oobj, fobj) {
@@ -2093,7 +2110,6 @@
             }
         }
     };
-
     Go.Animate = function(e, profile, tween, unit, callBack, d, t) {
         //首先你要清楚, 一个动画.什么在变, 什么是不变
         //而一个模块里.真正在变化的. 只有一个参数.也就是以t为标准的步长参数在不断的变化.
@@ -2256,8 +2272,8 @@
     function hasClass(elm, className) {
         return new RegExp(Go.PaddingString(className)).test(Go.PaddingString(elm.className));
     }
-
-    function getClass(elm, tag) {
+    
+	function getClass(elm, tag) {
         //惰性载入的函数设计方式
         if (doc.getElementsByClassName) {
             //HTML5的方法
@@ -2322,7 +2338,6 @@
         }
         return createXHR();
     }
-
     function _onStateChanging(xhr, success, error) {
         if (xhr.readyState == 4 && xhr.responseText) {
             var s = xhr.status;

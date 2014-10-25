@@ -11,6 +11,7 @@
 <div class="divblock"></div>
    <script type="text/javascript">
 		Go(function(){
+			//	我就看看中文会不会乱码
 			//	G {{ Template }} base on Underscore Template 
 			// 	fast {{ Building }} the Template at once
 			//	you {{ need }} write word like this
@@ -20,12 +21,12 @@
 				+'{{  data = data["list"]; }}'
 				+'{{  DataList = JSON.parse(decodeURIComponent(data)); }}'
 				+'{{  console.log(DataList); }}'
-				+'{{  Go.ObjEach(DataList,function(item){  }}' 
-				+	'<li>{{= item.lag }}</li>'
-				+	'<li>{{= item.autor }}</li>' 	
-				+'{{  }) }}'
+				+'{{  Go.ObjEach(DataList,function(item){ 	}}' 
+				+			'<li>{{= item.lag }}</li>'
+				+			'<li>{{= item.autor }}</li>' 	
+				+'{{ 	}) }}'
 				+'</ol>'
-				+'{{ Go("#btn").unbind() }}'
+				+'{{  Go("#btn").unbind(); }}';
 
 			var tpl = Go.template(tplBuilding,{ variable:"data" });
 
@@ -40,5 +41,5 @@
 				
 		});
    </script>     
-</body>
+   </body>
 </html>
