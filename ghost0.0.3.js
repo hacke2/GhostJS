@@ -35,6 +35,7 @@
                   .....                  
                     .       
  *
+ *
  */
 
 (function(Global, alreadyGO) {
@@ -54,6 +55,7 @@
      * @ 核心入口
      * @ 最终接入window
      */
+
     var Go = function(obj) {
         if (obj instanceof Function) {
 
@@ -156,11 +158,11 @@
         nativeReduce 		=	 G_Array.reduce,
         nativeReduceRight 	=	 G_Array.reduceRight,
         nativeIsArray 		=	 Array.isArray,
+		nativeBind			=	 Function.prototype.bind,
         //ECMAScript 6
         nativeFill 			=	 G_Array.fill,
         //Other
         nativeToString 		=	 Object.prototype.toString;
-
 
     var isId   				= /^#\w+/,
         isClass   			= /^(\.)(\w+)/,
@@ -168,7 +170,6 @@
         isAll   			= /^\*$/,
         advSelector   		= /.+>.+/g,
         qSA   				= doc.querySelectorAll;
-
     /*
      * NoSQL DataBase
      * @ NoSQL 事件记录
@@ -193,8 +194,8 @@
      */
     Go.NoSQL 		= {};
     Go.NoSQLStack 	= 0;
-
-    /*
+   
+   	/*
      * GhostStack
      * @ 选择器缓存机制
      * @ 利用缓存极大降低选择器重复选择同一元素时候带来的性能损耗
@@ -220,12 +221,12 @@
 
     //Browser UserAgent Information
     var MSIE8 		= !-[1, ];
-    Go.isIE 			= userAgent.indexOf("Trident") > 0;
-    Go.isIE6 		= userAgent.indexOf("MSIE 6.0") > 0;
-    Go.isIE7 		= userAgent.indexOf("MSIE 7.0") > 0;
-    Go.isIE8 		= userAgent.indexOf("MSIE 8.0") > 0;
-    Go.isChrome 		= userAgent.indexOf("Chrome") > 0;
-    Go.isFireFox 	= userAgent.indexOf("Firefox") > 0;
+    Go.isIE 		= /Trident/i.test(userAgent);
+    Go.isIE6 		= /MSIE 6.0/i.test(userAgent);
+    Go.isIE7 		= /MSIE 7.0/i.test(userAgent);
+    Go.isIE8 		= /MSIE 8.0/i.test(userAgent);
+    Go.isChrome 	= global.chrome;
+    Go.isFireFox 	= /Firefox/i.test(userAgent);
 
 
     /*
@@ -1179,7 +1180,6 @@
             return doc.body.clientHeight - doc.documentElement.clientHeight - this.bscTop();
         }
 	};
-
     //Go.PaddingString 填充字符串首尾 增加空格
     /**
      * @return {string}
@@ -1570,6 +1570,46 @@
 		if(!arguments.length) return [];
 		return slice.call(arguments);
 	};
+	
+	//Go.FuncBind ECMAScript 5
+	//instanceof Underscore.js
+	var Cproto = function(){};
+
+	Go.FuncBind = function(func,context){
+		if(nativeBind && func.bind === nativeBind) 
+			Go.FuncBind = function(func,context){
+				if(!Go.isFunction(func)) throw new Error("first param must be a function call!");
+				return nativeBind.apply(func,slice.call(arguments,1));
+			}
+		else 
+			Go.FuncBind = function(func,context){
+				var args = slice.call(arguments,2);
+				var bound = function(){
+					if(!(this instanceof bound))
+						//注意了, 这一句return内部的arguments指的是匿名函数如果传入了参数.
+						return func.apply(context,args.concat(slice.call(arguments)));
+					Cproto.prototype = func.prototype;
+					var self = Cproto;
+					Cproto.prototype = null;
+					
+					var result = func.apply(self,args.concat(slice.call(arguments)));
+					if(Go.isObject(result))
+						return result;
+					return self;
+				}
+				return bound;
+			}
+		return Go.FuncBind(func,context);		
+	}
+	//Obj对象中的 函数执行批量绑定,将函数触发时候的this指向该对象的内部
+	Go.ObjBindAll = function(obj){
+		var l = arguments.length;
+		for(var i=1,key; i<l; i++){
+			key = arguments[i];
+			obj[key] = Go.FuncBind(obj[key],obj);
+		}
+		return obj;
+	}
 
 	Go.Random = function(min,max){
 		if(max == null){
