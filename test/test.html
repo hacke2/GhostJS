@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ghost Template</title>
+	<script type="text/javascript" src="../ghost0.0.3.js"></script>
+</head>
+<body>
+<button id="btn">Click</button>
+<div id="list"></div>
+<div class="divblock"></div>
+<div class="divblock"></div>
+<script type="text/javascript">
+		Go(function(){
+			//	我就看看中文会不会乱码
+			//	G {{ Template }} base on Underscore Template 
+			// 	fast {{ Building }} the Template at once
+			//	you {{ need }} write word like this
+			var tplBuilding =
+		   		''	
+				+	'<ol>'
+				+	'{{  data = data["list"]; }}'
+				+	'{{  DataList = JSON.parse(decodeURIComponent(data)); }}'
+				+	'{{  console.log(DataList); }}'
+				+	'{{  Go.ObjEach(DataList,function(item){ 	}}' 
+				+		'<li>{{= item.lag }}</li>'
+				+		'<li>{{= item.autor }}</li>' 	
+				+	'{{ 	}) }}'
+				+	'</ol>'
+				+	'{{  Go("#btn").unbind(); }}';
+
+			var tpl = Go.template(tplBuilding,{ variable:"data" });
+			
+			Go("#btn").bind("click",function(){
+				Go.JSONP({
+					url		:	"http://jsfiddle.Net/echo/jsonp",
+					data	:	{ 'list': '{ "1":{"lag":"JavaScript","autor":"Ghost" }, "2":{"lag":"C++","autor":"Demon"} }' },
+					fail 	:   function(e){ alert(e); },
+					success	:	function(data){ Go("#list .divblock").insetHTML(tpl(data)) } 
+				});
+			});
+			
+			this.x = 9; 
+			var module = {
+			  x: 81,
+			  getX: function(a,b,c,d,e) { console.log(arguments); console.log(this.x) }
+			};
+			
+			var getX = module.getX;
+			getX(); // 9, because in this case, "this" refers to the global object
+			
+			// Create a new function with 'this' bound to module
+			boundGetX = Go.FuncBind(module.getX,module,[9,10,11]);
+			boundGetX(1,2,3,4,5,6,7,8); // 81			
+		});
+   </script>     
+   </body>
+</html>
